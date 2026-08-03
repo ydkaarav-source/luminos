@@ -1,0 +1,15 @@
+"""
+Imports every model so `Base.metadata` is complete wherever this module
+is imported - needed for Alembic autogenerate and safe at app startup.
+"""
+from app.models.user import User  # noqa: F401
+from app.models.business import Business  # noqa: F401
+from app.models.goal import BusinessGoal  # noqa: F401
+from app.models.project import Project  # noqa: F401
+from app.models.task import Task  # noqa: F401
+from app.models.revenue_entry import RevenueEntry  # noqa: F401
+from app.models.health_score import HealthScore  # noqa: F401
+from app.models.business_plan import BusinessPlan  # noqa: F401
+from app.models.ai_conversation import AIConversation  # noqa: F401
+from app.models.ai_insight import AIInsight  # noqa: F401
+from app.models.memory_record import MemoryRecord  # noqa: F401
