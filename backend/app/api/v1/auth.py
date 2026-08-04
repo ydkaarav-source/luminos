@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.dependencies.auth_dependencies import get_current_user
 from app.dependencies.db_dependencies import get_db
 from app.models.user import User
@@ -12,7 +13,18 @@ from app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-COOKIE_KWARGS = dict(httponly=True, secure=True, samesite="lax")
+# Locally, frontend (localhost:3000) and backend (localhost:8000) share the
+# same "site" (site is judged by domain, ignoring port), so Lax works fine.
+# In production, frontend (Vercel) and backend (Railway) are genuinely
+# different domains - a cross-site fetch - which Lax cookies are blocked on.
+# SameSite=None allows that, but browsers require Secure=True alongside it,
+# which is already the case since both are served over HTTPS in production.
+_is_production = settings.ENVIRONMENT == "production"
+COOKIE_KWARGS = dict(
+    httponly=True,
+    secure=True,
+    samesite="none" if _is_production else "lax",
+)
 
 
 def _set_auth_cookies(response: Response, access_token: str, refresh_token: str) -> None:
