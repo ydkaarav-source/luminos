@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { href: "/ceo-briefing", label: "CEO Briefing" },
   { href: "/health-score", label: "Health Score" },
   { href: "/solopreneur-hub/tasks", label: "Solopreneur Hub" },
+  { href: "/analytics/business", label: "Analytics" },
   { href: "/assistant", label: "AI Assistant" },
   { href: "/settings", label: "Settings" },
 ];

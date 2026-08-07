@@ -119,3 +119,50 @@ export interface ApiEnvelope<T> {
 export interface ApiErrorEnvelope {
   error: { code: string; message: string; details: Record<string, unknown> };
 }
+export interface RevenuePoint {
+  period: string;
+  amount: number;
+}
+
+export interface TaskCompletionPoint {
+  period: string;
+  completed: number;
+  created: number;
+}
+
+export interface HealthScoreHistoryPoint {
+  calculated_at: string;
+  overall_score: number;
+}
+
+export interface BusinessAnalytics {
+  revenue_over_time: RevenuePoint[];
+  task_completion_over_time: TaskCompletionPoint[];
+  health_score_history: HealthScoreHistoryPoint[];
+}
+
+export type TradeSide = "buy" | "sell";
+
+export interface Trade {
+  id: string;
+  symbol: string;
+  side: TradeSide;
+  quantity: number;
+  price: number;
+  trade_date: string;
+  notes: string | null;
+}
+
+export interface Position {
+  symbol: string;
+  quantity: number;
+  average_cost: number;
+  total_cost: number;
+  realized_pl: number;
+}
+
+export interface PortfolioSummary {
+  positions: Position[];
+  total_realized_pl: number;
+  total_cost_basis: number;
+}
