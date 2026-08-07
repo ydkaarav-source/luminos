@@ -41,3 +41,20 @@
     @apply text-xs font-medium text-ink-muted uppercase tracking-wide;
   }
 }
+@keyframes lumin-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [aria-hidden="true"] {
+    animation: none !important;
+  }
+}
