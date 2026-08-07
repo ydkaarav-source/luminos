@@ -13,3 +13,4 @@ from app.models.business_plan import BusinessPlan  # noqa: F401
 from app.models.ai_conversation import AIConversation  # noqa: F401
 from app.models.ai_insight import AIInsight  # noqa: F401
 from app.models.memory_record import MemoryRecord  # noqa: F401
+from app.models.trade import Trade  # noqa: F401
