@@ -28,8 +28,11 @@ const CHART_COLORS = {
   text: "#9AA3BC",
 };
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+function formatDate(iso: unknown) {
+  if (!iso) return "";
+  const d = new Date(iso as string | number);
+  if (isNaN(d.getTime())) return String(iso);
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
 export default function BusinessAnalyticsPage() {
