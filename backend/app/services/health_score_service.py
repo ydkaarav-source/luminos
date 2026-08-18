@@ -47,17 +47,25 @@ class HealthScoreService:
         scores = self._compute_rule_based_scores(business)
 
         memory_lines = self.ai.get_memory_context(business.id)
-        system_prompt, user_prompt = prompt_template.build_prompt(scores, memory_lines)
 
-        raw = await self.ai.run(
-            business_id=business.id,
-            user_id=user_id,
-            context_type=ConversationContext.HEALTH_SCORE,
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-            json_mode=True,
-        )
-        explanation = self.ai.run_json(raw)
+        # One focused AI call per executive role instead of a single call
+        # reasoning about all five categories at once - see
+        # health_score_explainer.build_role_prompt for why narrower prompts
+        # produce less generic output. "ceo" runs last since a future
+        # version could have it read the other four roles' findings before
+        # writing its own synthesis; today it doesn't need to.
+        explanation: dict[str, dict] = {}
+        for role in ("cfo", "cmo", "coo", "cro", "ceo"):
+            system_prompt, user_prompt = prompt_template.build_role_prompt(role, scores, memory_lines)
+            raw = await self.ai.run(
+                business_id=business.id,
+                user_id=user_id,
+                context_type=ConversationContext.HEALTH_SCORE,
+                system_prompt=system_prompt,
+                user_prompt=user_prompt,
+                json_mode=True,
+            )
+            explanation[role] = self.ai.run_json(raw)
 
         record = HealthScore(business_id=business.id, ai_explanation=explanation, **scores)
         self.db.add(record)

@@ -55,6 +55,11 @@ export interface HealthScoreExplanation {
   recommendations: string[];
 }
 
+// One explanation per executive role instead of a single flat object -
+// mirrors backend/app/schemas/health_score.py's HealthScoreExplanation
+// (a dict of role -> RoleExplanation).
+export type HealthScoreRole = "ceo" | "cfo" | "cmo" | "coo" | "cro";
+
 export interface HealthScore {
   id: string;
   overall_score: number;
@@ -63,7 +68,7 @@ export interface HealthScore {
   marketing_score: number;
   customer_growth_score: number;
   financial_management_score: number;
-  ai_explanation: HealthScoreExplanation;
+  ai_explanation: Record<HealthScoreRole, HealthScoreExplanation>;
   calculated_at: string;
 }
 

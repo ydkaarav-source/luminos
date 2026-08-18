@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { useHealthScore } from "@/hooks/useHealthScore";
 import { apiClient } from "@/lib/api-client";
-import type { HealthScore } from "@/lib/types";
+import type { HealthScore, HealthScoreRole } from "@/lib/types";
 
 const CATEGORY_LABELS: Record<string, string> = {
   revenue_score: "Revenue",
@@ -18,11 +18,24 @@ const CATEGORY_LABELS: Record<string, string> = {
   financial_management_score: "Financial management",
 };
 
+// CEO listed first - it's the synthesized top-level view, the other four
+// are each scoped to one narrow slice of the business.
+const ROLES: { key: HealthScoreRole; label: string; description: string }[] = [
+  { key: "ceo", label: "CEO", description: "The synthesized, top-level read across the whole business." },
+  { key: "cfo", label: "CFO", description: "Revenue and financial management." },
+  { key: "cmo", label: "CMO", description: "Marketing performance." },
+  { key: "coo", label: "COO", description: "Operations and task execution." },
+  { key: "cro", label: "CRO", description: "Customer growth." },
+];
+
 export default function HealthScorePage() {
   const { score: initialScore, loading } = useHealthScore();
   const [score, setScore] = useState<HealthScore | null>(null);
   const [recalculating, setRecalculating] = useState(false);
+  const [activeRole, setActiveRole] = useState<HealthScoreRole>("ceo");
   const active = score ?? initialScore;
+  const activeExplanation = active?.ai_explanation[activeRole];
+  const activeRoleMeta = ROLES.find((r) => r.key === activeRole);
 
   async function recalculate() {
     setRecalculating(true);
@@ -68,32 +81,53 @@ export default function HealthScorePage() {
             </div>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <Card>
-              <CardHeader title="Strengths" />
-              <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
-                {active.ai_explanation.strengths.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
-              </ul>
-            </Card>
-            <Card>
-              <CardHeader title="Weaknesses" />
-              <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
-                {active.ai_explanation.weaknesses.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
-              </ul>
-            </Card>
-            <Card>
-              <CardHeader title="Recommendations" />
-              <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
-                {active.ai_explanation.recommendations.map((s, i) => (
-                  <li key={i}>{s}</li>
-                ))}
-              </ul>
-            </Card>
+          <div className="flex gap-1 border-b border-border-subtle">
+            {ROLES.map((role) => (
+              <button
+                key={role.key}
+                onClick={() => setActiveRole(role.key)}
+                className={`px-4 py-2.5 text-sm border-b-2 transition ${
+                  activeRole === role.key
+                    ? "border-accent text-ink font-medium"
+                    : "border-transparent text-ink-muted hover:text-ink"
+                }`}
+              >
+                {role.label}
+              </button>
+            ))}
           </div>
+
+          {activeExplanation && (
+            <div className="space-y-3">
+              {activeRoleMeta && <p className="text-sm text-ink-faint">{activeRoleMeta.description}</p>}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <Card>
+                  <CardHeader title="Strengths" />
+                  <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
+                    {activeExplanation.strengths.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ul>
+                </Card>
+                <Card>
+                  <CardHeader title="Weaknesses" />
+                  <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
+                    {activeExplanation.weaknesses.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ul>
+                </Card>
+                <Card>
+                  <CardHeader title="Recommendations" />
+                  <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
+                    {activeExplanation.recommendations.map((s, i) => (
+                      <li key={i}>{s}</li>
+                    ))}
+                  </ul>
+                </Card>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </AppShell>
