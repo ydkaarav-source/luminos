@@ -49,6 +49,16 @@ export interface Task {
   project_id: string | null;
 }
 
+export interface BusinessProfile {
+  id: string;
+  business_id: string;
+  industry: string | null;
+  description: string | null;
+  products_services: string | null;
+  target_customers: string | null;
+  company_goals: string | null;
+}
+
 export interface HealthScoreExplanation {
   strengths: string[];
   weaknesses: string[];

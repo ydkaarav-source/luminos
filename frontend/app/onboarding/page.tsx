@@ -15,7 +15,7 @@ import type {
   PrimaryGoal,
 } from "@/lib/types";
 
-const STEPS = ["profile", "business", "resources"] as const;
+const STEPS = ["profile", "business", "brain", "resources"] as const;
 type Step = (typeof STEPS)[number];
 
 const STAGE_OPTIONS: { value: BusinessStage; label: string }[] = [
@@ -94,6 +94,13 @@ export default function OnboardingPage() {
   const [businessType, setBusinessType] = useState<BusinessType | null>(null);
   const [primaryGoal, setPrimaryGoal] = useState<PrimaryGoal | null>(null);
 
+  // brain
+  const [industry, setIndustry] = useState("");
+  const [description, setDescription] = useState("");
+  const [productsServices, setProductsServices] = useState("");
+  const [targetCustomers, setTargetCustomers] = useState("");
+  const [companyGoals, setCompanyGoals] = useState("");
+
   // resources
   const [timePerWeek, setTimePerWeek] = useState("");
   const [budgetRange, setBudgetRange] = useState<BudgetRange | null>(null);
@@ -118,6 +125,14 @@ export default function OnboardingPage() {
           stage,
           business_type: businessType,
           primary_goal: primaryGoal,
+        });
+      } else if (step === "brain") {
+        await apiClient.post("/onboarding/business-brain", {
+          industry: industry.trim() || null,
+          description: description.trim() || null,
+          products_services: productsServices.trim() || null,
+          target_customers: targetCustomers.trim() || null,
+          company_goals: companyGoals.trim() || null,
         });
       } else if (step === "resources") {
         await apiClient.post("/onboarding/resources", {
@@ -202,6 +217,62 @@ export default function OnboardingPage() {
               <div>
                 <label className="label block mb-1.5">Primary goal</label>
                 <OptionGrid options={GOAL_OPTIONS} value={primaryGoal} onChange={setPrimaryGoal} />
+              </div>
+            </div>
+          </>
+        )}
+
+        {step === "brain" && (
+          <>
+            <h1 className="font-display text-xl font-medium mb-1">Give your AI more to work with</h1>
+            <p className="text-sm text-ink-muted mb-6">
+              Optional, but the more you share, the sharper your AI CEO's advice gets. Skip anything
+              you'd rather fill in later.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <label className="label block mb-1.5">Industry</label>
+                <Input value={industry} onChange={(e) => setIndustry(e.target.value)} placeholder="e.g. Marketing services" />
+              </div>
+              <div>
+                <label className="label block mb-1.5">Description</label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  rows={3}
+                  placeholder="What does this business actually do?"
+                  className="input-field resize-none"
+                />
+              </div>
+              <div>
+                <label className="label block mb-1.5">Products or services offered</label>
+                <textarea
+                  value={productsServices}
+                  onChange={(e) => setProductsServices(e.target.value)}
+                  rows={3}
+                  placeholder="What do you sell?"
+                  className="input-field resize-none"
+                />
+              </div>
+              <div>
+                <label className="label block mb-1.5">Target customers</label>
+                <textarea
+                  value={targetCustomers}
+                  onChange={(e) => setTargetCustomers(e.target.value)}
+                  rows={3}
+                  placeholder="Who are you selling to?"
+                  className="input-field resize-none"
+                />
+              </div>
+              <div>
+                <label className="label block mb-1.5">Company goals</label>
+                <textarea
+                  value={companyGoals}
+                  onChange={(e) => setCompanyGoals(e.target.value)}
+                  rows={3}
+                  placeholder="What are you trying to achieve?"
+                  className="input-field resize-none"
+                />
               </div>
             </div>
           </>

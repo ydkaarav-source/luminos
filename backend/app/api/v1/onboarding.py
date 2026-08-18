@@ -8,8 +8,10 @@ from app.dependencies.db_dependencies import get_db
 from app.models.user import User
 from app.repositories.business_repository import BusinessRepository
 from app.schemas.business import BusinessOut
+from app.schemas.business_profile import BusinessProfileOut
 from app.schemas.common import Envelope, ResponseMeta
 from app.schemas.onboarding import (
+    BusinessBrainStepRequest,
     BusinessStepRequest,
     OnboardingStatusOut,
     ProfileStepRequest,
@@ -52,6 +54,17 @@ def business_step(
 ):
     business = OnboardingService(db).save_business_step(current_user, payload)
     return _envelope(BusinessOut.model_validate(business))
+
+
+@router.post("/business-brain", response_model=Envelope[BusinessProfileOut])
+def business_brain_step(
+    payload: BusinessBrainStepRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    business = BusinessRepository(db).get_active_for_user(current_user.id)
+    profile = OnboardingService(db).save_business_brain_step(business, payload)
+    return _envelope(BusinessProfileOut.model_validate(profile))
 
 
 @router.post("/resources", response_model=Envelope[BusinessOut])

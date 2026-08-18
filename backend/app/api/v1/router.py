@@ -5,6 +5,7 @@ from app.api.v1 import (
     assistant,
     auth,
     business_builder,
+    business_profile,
     businesses,
     ceo_briefing,
     goals,
@@ -21,6 +22,7 @@ api_router = APIRouter()
 api_router.include_router(auth.router)
 api_router.include_router(onboarding.router)
 api_router.include_router(businesses.router)
+api_router.include_router(business_profile.router)
 api_router.include_router(goals.router)
 api_router.include_router(projects.router)
 api_router.include_router(tasks.router)

@@ -18,6 +18,14 @@ class BusinessStepRequest(BaseModel):
     primary_goal: PrimaryGoal
 
 
+class BusinessBrainStepRequest(BaseModel):
+    industry: str | None = None
+    description: str | None = None
+    products_services: str | None = None
+    target_customers: str | None = None
+    company_goals: str | None = None
+
+
 class ResourcesStepRequest(BaseModel):
     available_time_per_week: int | None = None
     budget_range: BudgetRange | None = None
