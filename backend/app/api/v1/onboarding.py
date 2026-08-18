@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import NotFoundError
 from app.dependencies.auth_dependencies import get_current_user
 from app.dependencies.db_dependencies import get_db
 from app.models.user import User
@@ -63,6 +64,8 @@ def business_brain_step(
     db: Session = Depends(get_db),
 ):
     business = BusinessRepository(db).get_active_for_user(current_user.id)
+    if not business:
+        raise NotFoundError("No active business found. Complete onboarding to create one.")
     profile = OnboardingService(db).save_business_brain_step(business, payload)
     return _envelope(BusinessProfileOut.model_validate(profile))
 
@@ -74,6 +77,8 @@ def resources_step(
     db: Session = Depends(get_db),
 ):
     business = BusinessRepository(db).get_active_for_user(current_user.id)
+    if not business:
+        raise NotFoundError("No active business found. Complete onboarding to create one.")
     business = OnboardingService(db).save_resources_step(business, payload)
     return _envelope(BusinessOut.model_validate(business))
 
