@@ -29,13 +29,13 @@ async def today(
 ):
     service = CEOBriefingService(db)
     briefing = await service.generate_today(business, current_user.id)
-    return _envelope(CEOBriefingOut.model_validate(briefing))
+    return _envelope(CEOBriefingOut.from_insight(briefing))
 
 
 @router.get("/history", response_model=Envelope[list[CEOBriefingOut]])
 def history(business: Business = Depends(require_active_business), db: Session = Depends(get_db)):
     briefings = CEOBriefingService(db).get_history(business.id)
-    return _envelope([CEOBriefingOut.model_validate(b) for b in briefings])
+    return _envelope([CEOBriefingOut.from_insight(b) for b in briefings])
 
 
 @router.post("/{insight_id}/mark-read", response_model=Envelope[CEOBriefingOut])
@@ -48,4 +48,4 @@ def mark_read(
     if not insight or insight.business_id != business.id:
         raise NotFoundError("Briefing not found.")
     insight = CEOBriefingService(db).mark_read(insight)
-    return _envelope(CEOBriefingOut.model_validate(insight))
+    return _envelope(CEOBriefingOut.from_insight(insight))

@@ -37,11 +37,21 @@ export default function CEOBriefingPage() {
           {today && (
             <Card className="border-accent/30">
               <CardHeader
-                title={today.title}
+                title={today.finding}
                 subtitle="Today"
-                action={<Badge variant={today.priority}>{today.priority} priority</Badge>}
+                action={<Badge variant={today.confidence}>{today.confidence} confidence</Badge>}
               />
-              <p className="text-sm text-ink-muted leading-relaxed">{today.body}</p>
+              {today.why.length > 0 && (
+                <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside mb-4">
+                  {today.why.map((w, i) => (
+                    <li key={i}>{w}</li>
+                  ))}
+                </ul>
+              )}
+              <div className="rounded-lg border border-accent/30 bg-accent-soft p-4">
+                <p className="label mb-1.5 text-accent-glow">Recommendation</p>
+                <p className="text-sm text-ink leading-relaxed">{today.recommendation}</p>
+              </div>
             </Card>
           )}
 
@@ -52,11 +62,21 @@ export default function CEOBriefingPage() {
                 {history.map((b) => (
                   <Card key={b.id}>
                     <CardHeader
-                      title={b.title}
+                      title={b.finding}
                       subtitle={new Date(b.generated_at).toLocaleDateString()}
-                      action={<Badge variant={b.priority}>{b.priority}</Badge>}
+                      action={<Badge variant={b.confidence}>{b.confidence}</Badge>}
                     />
-                    <p className="text-sm text-ink-muted leading-relaxed">{b.body}</p>
+                    {b.why.length > 0 && (
+                      <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside mb-4">
+                        {b.why.map((w, i) => (
+                          <li key={i}>{w}</li>
+                        ))}
+                      </ul>
+                    )}
+                    <div className="rounded-lg border border-accent/30 bg-accent-soft p-4">
+                      <p className="label mb-1.5 text-accent-glow">Recommendation</p>
+                      <p className="text-sm text-ink leading-relaxed">{b.recommendation}</p>
+                    </div>
                   </Card>
                 ))}
               </div>

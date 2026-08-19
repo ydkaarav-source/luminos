@@ -84,9 +84,10 @@ export interface HealthScore {
 
 export interface CEOBriefing {
   id: string;
-  title: string;
-  body: string;
-  priority: "low" | "medium" | "high";
+  finding: string;
+  why: string[];
+  recommendation: string;
+  confidence: "high" | "medium" | "low";
   is_read: boolean;
   generated_at: string;
 }
