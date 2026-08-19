@@ -22,10 +22,11 @@ import { apiClient } from "@/lib/api-client";
 import type { BusinessAnalytics } from "@/lib/types";
 
 const CHART_COLORS = {
-  accent: "#3E6FD4",
-  positive: "#52B98A",
-  grid: "#343D54",
-  text: "#9AA3BC",
+  accent: "#16A34A",
+  positive: "#15803D",
+  grid: "#C8DFCC",
+  text: "#3E5745",
+  muted: "#6B8570",
 };
 
 function formatDate(iso: unknown) {
@@ -83,8 +84,8 @@ export default function BusinessAnalyticsPage() {
                   <YAxis stroke={CHART_COLORS.text} fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip
                     labelFormatter={formatDate}
-                    contentStyle={{ background: "#242B3D", border: "1px solid #343D54", borderRadius: 8 }}
-                    labelStyle={{ color: "#EDF0F5" }}
+                    contentStyle={{ background: "#FFFFFF", border: "1px solid #C8DFCC", borderRadius: 8 }}
+                    labelStyle={{ color: "#0B1810" }}
                   />
                   <Area
                     type="monotone"
@@ -117,10 +118,10 @@ export default function BusinessAnalyticsPage() {
                   <YAxis stroke={CHART_COLORS.text} fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
                     labelFormatter={formatDate}
-                    contentStyle={{ background: "#242B3D", border: "1px solid #343D54", borderRadius: 8 }}
-                    labelStyle={{ color: "#EDF0F5" }}
+                    contentStyle={{ background: "#FFFFFF", border: "1px solid #C8DFCC", borderRadius: 8 }}
+                    labelStyle={{ color: "#0B1810" }}
                   />
-                  <Bar dataKey="created" fill={CHART_COLORS.grid} radius={[3, 3, 0, 0]} />
+                  <Bar dataKey="created" fill={CHART_COLORS.muted} radius={[3, 3, 0, 0]} />
                   <Bar dataKey="completed" fill={CHART_COLORS.positive} radius={[3, 3, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -152,8 +153,8 @@ export default function BusinessAnalyticsPage() {
                   />
                   <Tooltip
                     labelFormatter={formatDate}
-                    contentStyle={{ background: "#242B3D", border: "1px solid #343D54", borderRadius: 8 }}
-                    labelStyle={{ color: "#EDF0F5" }}
+                    contentStyle={{ background: "#FFFFFF", border: "1px solid #C8DFCC", borderRadius: 8 }}
+                    labelStyle={{ color: "#0B1810" }}
                   />
                   <Line
                     type="monotone"

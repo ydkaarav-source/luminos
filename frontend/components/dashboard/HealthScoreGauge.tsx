@@ -6,9 +6,9 @@ const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 function colorForScore(score: number): string {
-  if (score >= 75) return "#2FD9C4"; // positive
-  if (score >= 50) return "#4C6FFF"; // accent
-  return "#F5A623"; // warning
+  if (score >= 75) return "#15803D"; // positive
+  if (score >= 50) return "#16A34A"; // accent
+  return "#B45309"; // warning
 }
 
 export function HealthScoreGauge({ score }: { score: number }) {
@@ -22,7 +22,7 @@ export function HealthScoreGauge({ score }: { score: number }) {
           cx={SIZE / 2}
           cy={SIZE / 2}
           r={RADIUS}
-          stroke="#1F2430"
+          stroke="#DFEEE2"
           strokeWidth={STROKE}
           fill="none"
         />

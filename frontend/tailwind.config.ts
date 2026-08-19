@@ -5,34 +5,42 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: "#1D2333",
-        panel: "#242B3D",
-        "panel-raised": "#2C3447",
+        canvas: "#EEF5EF",
+        panel: "#FFFFFF",
+        "panel-raised": "#DFEEE2",
         border: {
-          DEFAULT: "#343D54",
-          subtle: "#2A3145",
+          DEFAULT: "#C8DFCC",
+          subtle: "#D8E8DB",
         },
         ink: {
-          DEFAULT: "#EDF0F5",
-          muted: "#9AA3BC",
-          faint: "#6B7590",
+          DEFAULT: "#0B1810",
+          muted: "#3E5745",
+          faint: "#6B8570",
         },
         accent: {
-          DEFAULT: "#3E6FD4",
-          soft: "#28345C",
-          glow: "#7BA8D9",
+          DEFAULT: "#16A34A",
+          soft: "#DCF3E3",
+          glow: "#22C55E",
+          bright: "#4ADE80",
+        },
+        night: {
+          DEFAULT: "#0A0F0C",
+          card: "#101B13",
+          border: "#1E2E22",
+          text: "#FAFAFA",
+          "text-muted": "#A8BFA9",
         },
         positive: {
-          DEFAULT: "#52B98A",
-          soft: "#1C3A2E",
+          DEFAULT: "#15803D",
+          soft: "#D7EEDD",
         },
         warning: {
-          DEFAULT: "#F5A623",
-          soft: "#3A2C10",
+          DEFAULT: "#B45309",
+          soft: "#FCEACB",
         },
         danger: {
-          DEFAULT: "#FF5C7A",
-          soft: "#3A1420",
+          DEFAULT: "#E11D48",
+          soft: "#FDE2E7",
         },
       },
       fontFamily: {
@@ -46,11 +54,11 @@ const config: Config = {
       },
       boxShadow: {
         card: "0 1px 0 0 rgba(255,255,255,0.03) inset, 0 8px 24px -12px rgba(0,0,0,0.6)",
-        glow: "0 0 0 1px rgba(62,111,212,0.4), 0 0 24px 0 rgba(62,111,212,0.25)",
+        glow: "0 0 0 1px rgba(34,197,94,0.4), 0 0 24px 0 rgba(34,197,94,0.35)",
       },
       backgroundImage: {
         "grid-fade":
-          "radial-gradient(circle at 50% 0%, rgba(62,111,212,0.08), transparent 60%)",
+          "radial-gradient(circle at 50% 0%, rgba(22,163,74,0.07), transparent 60%)",
       },
     },
   },
