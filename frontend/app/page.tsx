@@ -86,7 +86,7 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-canvas text-ink">
       {/* ============ SECTION 1 — Hero (dark) ============ */}
-      <section className="relative overflow-hidden bg-night">
+      <section className="relative overflow-hidden bg-night min-h-screen flex flex-col">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -144,8 +144,8 @@ export default function HomePage() {
           />
         </svg>
 
-        <div className="relative z-10">
-          <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="relative z-10 flex flex-col flex-1">
+          <div className="max-w-6xl mx-auto px-6 h-16 w-full flex items-center justify-between shrink-0">
             <Logo className="text-lg" variant="dark" />
 
             <nav className="hidden md:flex items-center gap-8">
@@ -216,27 +216,29 @@ export default function HomePage() {
             </div>
           )}
 
-          <div className="max-w-4xl px-6 pt-20 pb-28 md:pt-28 md:pb-36">
-            <h1 className="font-serif text-5xl md:text-6xl leading-[1.08] tracking-tight text-night-text">
-              The AI operating system <span className="text-accent-bright">for entrepreneurs.</span>
-            </h1>
-            <p className="mt-6 text-lg text-night-text-muted max-w-xl leading-relaxed">
-              Health Score is plain math, not an AI guess — and every
-              recommendation reads your actual logged tasks and revenue.
-            </p>
-            <div className="mt-9 flex items-center gap-3">
-              <Link
-                href="/signup"
-                className="bg-accent-glow text-night rounded-lg px-6 py-3 text-sm font-medium shadow-glow hover:bg-accent-bright transition"
-              >
-                Get started
-              </Link>
-              <Link
-                href="/login"
-                className="border border-night-border text-night-text rounded-lg px-6 py-3 text-sm font-medium hover:border-accent-bright/50 transition"
-              >
-                Log in
-              </Link>
+          <div className="flex-1 flex items-center">
+            <div className="max-w-4xl px-6 py-16">
+              <h1 className="font-serif text-5xl md:text-6xl leading-[1.08] tracking-tight text-night-text">
+                The AI operating system <span className="text-accent-bright">for entrepreneurs.</span>
+              </h1>
+              <p className="mt-6 text-lg text-night-text-muted max-w-xl leading-relaxed">
+                Health Score is plain math, not an AI guess — and every
+                recommendation reads your actual logged tasks and revenue.
+              </p>
+              <div className="mt-9 flex items-center gap-3">
+                <Link
+                  href="/signup"
+                  className="bg-accent-glow text-night rounded-lg px-6 py-3 text-sm font-medium shadow-glow hover:bg-accent-bright transition"
+                >
+                  Get started
+                </Link>
+                <Link
+                  href="/login"
+                  className="border border-night-border text-night-text rounded-lg px-6 py-3 text-sm font-medium hover:border-accent-bright/50 transition"
+                >
+                  Log in
+                </Link>
+              </div>
             </div>
           </div>
         </div>
