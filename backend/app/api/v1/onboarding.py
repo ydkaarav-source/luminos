@@ -84,6 +84,6 @@ def resources_step(
 
 
 @router.post("/complete")
-def complete(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    OnboardingService(db).complete(current_user)
+async def complete(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    await OnboardingService(db).complete(current_user)
     return _envelope({"onboarding_completed": True})

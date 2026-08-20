@@ -6,8 +6,9 @@ import { BusinessBuilderCard } from "@/components/dashboard/BusinessBuilderCard"
 import { CEOBriefingCard } from "@/components/dashboard/CEOBriefingCard";
 import { HealthScoreGauge } from "@/components/dashboard/HealthScoreGauge";
 import { SolopreneurHubCard } from "@/components/dashboard/SolopreneurHubCard";
-import { Card } from "@/components/ui/Card";
 import { AppShell } from "@/components/layout/AppShell";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
 import { useBusiness } from "@/hooks/useBusiness";
 import { useHealthScore } from "@/hooks/useHealthScore";
 import { useTasks } from "@/hooks/useTasks";
@@ -51,7 +52,10 @@ export default function DashboardPage() {
             <>
               <HealthScoreGauge score={score.overall_score} />
               <div>
-                <p className="label mb-1">Business Health</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <p className="label">Business Health</p>
+                  {score.is_demo && <Badge variant="demo">Demo</Badge>}
+                </div>
                 <p className="text-sm text-ink-muted">
                   {score.overall_score >= 75
                     ? "Strong across the board."

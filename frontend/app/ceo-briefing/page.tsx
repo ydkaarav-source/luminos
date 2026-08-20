@@ -39,7 +39,12 @@ export default function CEOBriefingPage() {
               <CardHeader
                 title={today.finding}
                 subtitle="Today"
-                action={<Badge variant={today.confidence}>{today.confidence} confidence</Badge>}
+                action={
+                  <div className="flex items-center gap-2">
+                    {today.is_demo && <Badge variant="demo">Demo</Badge>}
+                    <Badge variant={today.confidence}>{today.confidence} confidence</Badge>
+                  </div>
+                }
               />
               {today.why.length > 0 && (
                 <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside mb-4">

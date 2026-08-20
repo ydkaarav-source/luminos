@@ -29,6 +29,7 @@ class CEOBriefingOut(BaseModel):
     confidence: Literal["high", "medium", "low"]
     is_read: bool
     generated_at: datetime
+    is_demo: bool = False
 
     model_config = {"from_attributes": True}
 

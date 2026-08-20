@@ -32,5 +32,6 @@ class HealthScoreOut(BaseModel):
     financial_management_score: int
     ai_explanation: HealthScoreExplanation
     calculated_at: datetime
+    is_demo: bool = False
 
     model_config = {"from_attributes": True}

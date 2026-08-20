@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { HealthScoreGauge } from "@/components/dashboard/HealthScoreGauge";
 import { AppShell } from "@/components/layout/AppShell";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { useHealthScore } from "@/hooks/useHealthScore";
@@ -51,7 +52,10 @@ export default function HealthScorePage() {
     <AppShell>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-display text-2xl font-medium mb-1">Business Health Score</h1>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="font-display text-2xl font-medium">Business Health Score</h1>
+            {active?.is_demo && <Badge variant="demo">Demo</Badge>}
+          </div>
           <p className="text-ink-muted">A rule-based score, explained in plain language by AI.</p>
         </div>
         <Button onClick={recalculate} disabled={recalculating}>

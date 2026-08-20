@@ -8,7 +8,14 @@ export function CEOBriefingCard({ briefing }: { briefing: CEOBriefing | null }) 
       <CardHeader
         title="CEO Briefing"
         subtitle="Today's strategic read on your business"
-        action={briefing && <Badge variant={briefing.confidence}>{briefing.confidence} confidence</Badge>}
+        action={
+          briefing && (
+            <div className="flex items-center gap-2">
+              {briefing.is_demo && <Badge variant="demo">Demo</Badge>}
+              <Badge variant={briefing.confidence}>{briefing.confidence} confidence</Badge>
+            </div>
+          )
+        }
       />
       {briefing ? (
         <div>

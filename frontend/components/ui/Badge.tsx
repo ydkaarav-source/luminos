@@ -3,6 +3,7 @@ const VARIANTS = {
   medium: "bg-accent-soft text-accent-glow",
   high: "bg-warning-soft text-warning",
   positive: "bg-positive-soft text-positive",
+  demo: "bg-transparent border border-border text-ink-muted",
 };
 
 export function Badge({

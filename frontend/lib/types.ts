@@ -80,6 +80,7 @@ export interface HealthScore {
   financial_management_score: number;
   ai_explanation: Record<HealthScoreRole, HealthScoreExplanation>;
   calculated_at: string;
+  is_demo: boolean;
 }
 
 export interface CEOBriefing {
@@ -90,6 +91,7 @@ export interface CEOBriefing {
   confidence: "high" | "medium" | "low";
   is_read: boolean;
   generated_at: string;
+  is_demo: boolean;
 }
 
 export interface BusinessPlanOverview {
@@ -155,6 +157,7 @@ export interface BusinessAnalytics {
   revenue_over_time: RevenuePoint[];
   task_completion_over_time: TaskCompletionPoint[];
   health_score_history: HealthScoreHistoryPoint[];
+  is_demo: boolean;
 }
 
 export type TradeSide = "buy" | "sell";

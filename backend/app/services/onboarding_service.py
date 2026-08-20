@@ -13,6 +13,7 @@ from app.schemas.onboarding import (
     ProfileStepRequest,
     ResourcesStepRequest,
 )
+from app.services.health_score_service import HealthScoreService
 
 
 class OnboardingService:
@@ -107,11 +108,20 @@ class OnboardingService:
             )
         return business
 
-    def complete(self, user: User) -> User:
+    async def complete(self, user: User) -> User:
         user.onboarding_completed = True
         self.db.add(user)
         self.db.commit()
         self.db.refresh(user)
+
+        # Calculate an initial Health Score right away so the first
+        # dashboard visit after onboarding shows a real number instead of
+        # "No health score yet" - onboarding always creates a business in
+        # save_business_step, so one is guaranteed to exist here.
+        business = self.businesses.get_active_for_user(user.id)
+        if business:
+            await HealthScoreService(self.db).recalculate(business, user.id)
+
         return user
 
     def _seed_memory(self, business_id, content: str, memory_type: MemoryType) -> None:

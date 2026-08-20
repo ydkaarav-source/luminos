@@ -238,7 +238,17 @@ export default function HomePage() {
                 >
                   Log in
                 </Link>
+                <Link
+                  href="/signup"
+                  className="text-sm font-medium text-accent-bright hover:text-night-text transition px-2"
+                >
+                  Try the demo →
+                </Link>
               </div>
+              <p className="mt-3 text-xs text-night-text-muted">
+                After signing up, you'll see LuminOS running on a real example
+                business before you enter your own data.
+              </p>
             </div>
           </div>
         </div>

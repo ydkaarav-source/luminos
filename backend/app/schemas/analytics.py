@@ -23,3 +23,4 @@ class BusinessAnalyticsOut(BaseModel):
     revenue_over_time: list[RevenuePoint]
     task_completion_over_time: list[TaskCompletionPoint]
     health_score_history: list[HealthScorePoint]
+    is_demo: bool = False

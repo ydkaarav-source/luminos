@@ -17,6 +17,7 @@ import {
 
 import { AnalyticsTabs } from "@/components/analytics/AnalyticsTabs";
 import { AppShell } from "@/components/layout/AppShell";
+import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { apiClient } from "@/lib/api-client";
 import type { BusinessAnalytics } from "@/lib/types";
@@ -60,7 +61,11 @@ export default function BusinessAnalyticsPage() {
       ) : (
         <div className="space-y-5">
           <Card>
-            <CardHeader title="Revenue over time" subtitle="Logged revenue, by day" />
+            <CardHeader
+              title="Revenue over time"
+              subtitle="Logged revenue, by day"
+              action={data.is_demo && <Badge variant="demo">Demo</Badge>}
+            />
             {data.revenue_over_time.length === 0 ? (
               <p className="text-sm text-ink-faint">No revenue logged yet.</p>
             ) : (
@@ -100,7 +105,11 @@ export default function BusinessAnalyticsPage() {
           </Card>
 
           <Card>
-            <CardHeader title="Task completion" subtitle="Tasks created vs. completed, by day" />
+            <CardHeader
+              title="Task completion"
+              subtitle="Tasks created vs. completed, by day"
+              action={data.is_demo && <Badge variant="demo">Demo</Badge>}
+            />
             {data.task_completion_over_time.length === 0 ? (
               <p className="text-sm text-ink-faint">No task activity yet.</p>
             ) : (
@@ -129,7 +138,11 @@ export default function BusinessAnalyticsPage() {
           </Card>
 
           <Card>
-            <CardHeader title="Health Score history" subtitle="Overall score over time" />
+            <CardHeader
+              title="Health Score history"
+              subtitle="Overall score over time"
+              action={data.is_demo && <Badge variant="demo">Demo</Badge>}
+            />
             {data.health_score_history.length === 0 ? (
               <p className="text-sm text-ink-faint">No health scores calculated yet.</p>
             ) : (
