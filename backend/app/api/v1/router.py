@@ -10,6 +10,7 @@ from app.api.v1 import (
     ceo_briefing,
     goals,
     health_score,
+    memory,
     onboarding,
     projects,
     revenue,
@@ -33,3 +34,4 @@ api_router.include_router(ceo_briefing.router)
 api_router.include_router(assistant.router)
 api_router.include_router(trades.router)
 api_router.include_router(analytics.router)
+api_router.include_router(memory.router)

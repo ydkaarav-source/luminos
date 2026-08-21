@@ -160,6 +160,23 @@ export interface BusinessAnalytics {
   is_demo: boolean;
 }
 
+export type MemoryType = "fact" | "decision" | "preference" | "completed_milestone" | "note";
+export type MemorySource =
+  | "onboarding"
+  | "assistant_chat"
+  | "business_builder"
+  | "user_manual"
+  | "system_inferred";
+
+export interface MemoryRecord {
+  id: string;
+  memory_type: MemoryType;
+  content: string;
+  source: MemorySource;
+  relevance_score: number;
+  created_at: string;
+}
+
 export type TradeSide = "buy" | "sell";
 
 export interface Trade {

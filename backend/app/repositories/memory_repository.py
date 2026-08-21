@@ -37,3 +37,37 @@ class MemoryRepository:
             .limit(limit)
             .all()
         )
+
+    def list_for_business(self, business_id: UUID) -> list[MemoryRecord]:
+        return (
+            self.db.query(MemoryRecord)
+            .filter(MemoryRecord.business_id == business_id)
+            .order_by(MemoryRecord.created_at.desc())
+            .all()
+        )
+
+    def update(self, business_id: UUID, record_id: UUID, content: str) -> MemoryRecord | None:
+        record = (
+            self.db.query(MemoryRecord)
+            .filter(MemoryRecord.id == record_id, MemoryRecord.business_id == business_id)
+            .first()
+        )
+        if not record:
+            return None
+        record.content = content
+        self.db.add(record)
+        self.db.commit()
+        self.db.refresh(record)
+        return record
+
+    def delete(self, business_id: UUID, record_id: UUID) -> bool:
+        record = (
+            self.db.query(MemoryRecord)
+            .filter(MemoryRecord.id == record_id, MemoryRecord.business_id == business_id)
+            .first()
+        )
+        if not record:
+            return False
+        self.db.delete(record)
+        self.db.commit()
+        return True
