@@ -13,6 +13,7 @@ export function useTasks() {
     return apiClient
       .get<Task[]>("/tasks")
       .then(setTasks)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 

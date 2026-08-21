@@ -12,6 +12,7 @@ export function useBusiness() {
     apiClient
       .get<Business>("/businesses/active")
       .then(setBusiness)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
