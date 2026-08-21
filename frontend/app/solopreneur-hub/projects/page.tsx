@@ -41,7 +41,7 @@ export default function ProjectsPage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-medium mb-1">Solopreneur Hub — Projects</h1>
-      <p className="text-ink-muted mb-6">Group related tasks under a project.</p>
+      <p className="text-night-text-muted mb-6">Group related tasks under a project.</p>
 
       <Card className="mb-5">
         <form onSubmit={handleCreate} className="flex gap-2">
@@ -55,14 +55,14 @@ export default function ProjectsPage() {
       <Card>
         <CardHeader title="Projects" />
         {loading ? (
-          <p className="text-sm text-ink-faint">Loading…</p>
+          <p className="text-sm text-night-text-muted">Loading…</p>
         ) : projects.length === 0 ? (
-          <p className="text-sm text-ink-faint">No projects yet.</p>
+          <p className="text-sm text-night-text-muted">No projects yet.</p>
         ) : (
-          <ul className="divide-y divide-border-subtle">
+          <ul className="divide-y divide-night-border">
             {projects.map((p) => (
               <li key={p.id} className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink">{p.name}</span>
+                <span className="text-sm text-night-text">{p.name}</span>
                 <Badge variant={p.status === "completed" ? "positive" : "medium"}>{p.status}</Badge>
               </li>
             ))}

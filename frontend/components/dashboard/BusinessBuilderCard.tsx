@@ -6,7 +6,7 @@ export function BusinessBuilderCard() {
   return (
     <Card>
       <CardHeader title="Business Builder" subtitle="Turn an idea into a plan" />
-      <p className="text-sm text-ink-muted leading-relaxed mb-4">
+      <p className="text-sm text-night-text-muted leading-relaxed mb-4">
         Describe a business idea and get a target customer analysis, revenue
         model, launch roadmap, and action plan generated for you.
       </p>

@@ -6,9 +6,9 @@ const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 function colorForScore(score: number): string {
-  if (score >= 75) return "#15803D"; // positive
-  if (score >= 50) return "#16A34A"; // accent
-  return "#B45309"; // warning
+  if (score >= 75) return "#4ADE80"; // accent-bright
+  if (score >= 50) return "#22C55E"; // accent-glow
+  return "#F59E0B"; // brighter amber than the light-mode "warning" token - #B45309 is too dark to read against the night background
 }
 
 export function HealthScoreGauge({ score }: { score: number }) {
@@ -22,7 +22,7 @@ export function HealthScoreGauge({ score }: { score: number }) {
           cx={SIZE / 2}
           cy={SIZE / 2}
           r={RADIUS}
-          stroke="#DFEEE2"
+          stroke="#1E2E22"
           strokeWidth={STROKE}
           fill="none"
         />
@@ -40,8 +40,8 @@ export function HealthScoreGauge({ score }: { score: number }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-display text-2xl font-medium">{score}</span>
-        <span className="text-[10px] text-ink-faint uppercase tracking-wide">/ 100</span>
+        <span className="font-display text-2xl font-medium text-night-text">{score}</span>
+        <span className="text-[10px] text-night-text-muted uppercase tracking-wide">/ 100</span>
       </div>
     </div>
   );

@@ -28,10 +28,10 @@ export default function CEOBriefingPage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-medium mb-1">CEO Briefing</h1>
-      <p className="text-ink-muted mb-6">Your daily strategic read, generated each morning.</p>
+      <p className="text-night-text-muted mb-6">Your daily strategic read, generated each morning.</p>
 
       {loading ? (
-        <p className="text-sm text-ink-faint">Loading briefing…</p>
+        <p className="text-sm text-night-text-muted">Loading briefing…</p>
       ) : (
         <div className="space-y-4">
           {today && (
@@ -47,15 +47,15 @@ export default function CEOBriefingPage() {
                 }
               />
               {today.why.length > 0 && (
-                <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside mb-4">
+                <ul className="text-sm text-night-text-muted space-y-1.5 list-disc list-inside mb-4">
                   {today.why.map((w, i) => (
                     <li key={i}>{w}</li>
                   ))}
                 </ul>
               )}
-              <div className="rounded-lg border border-accent/30 bg-accent-soft p-4">
-                <p className="label mb-1.5 text-accent-glow">Recommendation</p>
-                <p className="text-sm text-ink leading-relaxed">{today.recommendation}</p>
+              <div className="rounded-lg border border-accent/30 bg-accent/15 p-4">
+                <p className="label mb-1.5 text-accent-bright">Recommendation</p>
+                <p className="text-sm text-night-text leading-relaxed">{today.recommendation}</p>
               </div>
             </Card>
           )}
@@ -72,15 +72,15 @@ export default function CEOBriefingPage() {
                       action={<Badge variant={b.confidence}>{b.confidence}</Badge>}
                     />
                     {b.why.length > 0 && (
-                      <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside mb-4">
+                      <ul className="text-sm text-night-text-muted space-y-1.5 list-disc list-inside mb-4">
                         {b.why.map((w, i) => (
                           <li key={i}>{w}</li>
                         ))}
                       </ul>
                     )}
-                    <div className="rounded-lg border border-accent/30 bg-accent-soft p-4">
-                      <p className="label mb-1.5 text-accent-glow">Recommendation</p>
-                      <p className="text-sm text-ink leading-relaxed">{b.recommendation}</p>
+                    <div className="rounded-lg border border-accent/30 bg-accent/15 p-4">
+                      <p className="label mb-1.5 text-accent-bright">Recommendation</p>
+                      <p className="text-sm text-night-text leading-relaxed">{b.recommendation}</p>
                     </div>
                   </Card>
                 ))}

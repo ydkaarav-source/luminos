@@ -22,12 +22,15 @@ import { Card, CardHeader } from "@/components/ui/Card";
 import { apiClient } from "@/lib/api-client";
 import type { BusinessAnalytics } from "@/lib/types";
 
+// Brighter than the light-mode tokens (#16A34A/#15803D/#C8DFCC/#3E5745) -
+// those are calibrated for contrast against a white card and are close to
+// invisible against the night-register panels these charts now sit on.
 const CHART_COLORS = {
-  accent: "#16A34A",
-  positive: "#15803D",
-  grid: "#C8DFCC",
-  text: "#3E5745",
-  muted: "#6B8570",
+  accent: "#4ADE80", // accent-bright
+  positive: "#22C55E", // accent-glow
+  grid: "#1E2E22", // night-border
+  text: "#A8BFA9", // night-text-muted
+  muted: "#A8BFA9", // night-text-muted
 };
 
 function formatDate(iso: unknown) {
@@ -51,13 +54,13 @@ export default function BusinessAnalyticsPage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-medium mb-1">Analytics</h1>
-      <p className="text-ink-muted mb-2">A closer look at how your business is trending.</p>
+      <p className="text-night-text-muted mb-2">A closer look at how your business is trending.</p>
       <AnalyticsTabs />
 
       {loading ? (
-        <p className="text-sm text-ink-faint">Loading…</p>
+        <p className="text-sm text-night-text-muted">Loading…</p>
       ) : !data ? (
-        <p className="text-sm text-ink-faint">No analytics data yet.</p>
+        <p className="text-sm text-night-text-muted">No analytics data yet.</p>
       ) : (
         <div className="space-y-5">
           <Card>
@@ -67,7 +70,7 @@ export default function BusinessAnalyticsPage() {
               action={data.is_demo && <Badge variant="demo">Demo</Badge>}
             />
             {data.revenue_over_time.length === 0 ? (
-              <p className="text-sm text-ink-faint">No revenue logged yet.</p>
+              <p className="text-sm text-night-text-muted">No revenue logged yet.</p>
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <AreaChart data={data.revenue_over_time}>
@@ -89,8 +92,9 @@ export default function BusinessAnalyticsPage() {
                   <YAxis stroke={CHART_COLORS.text} fontSize={12} tickLine={false} axisLine={false} />
                   <Tooltip
                     labelFormatter={formatDate}
-                    contentStyle={{ background: "#FFFFFF", border: "1px solid #C8DFCC", borderRadius: 8 }}
-                    labelStyle={{ color: "#0B1810" }}
+                    contentStyle={{ background: "#101B13", border: "1px solid #1E2E22", borderRadius: 8 }}
+                    labelStyle={{ color: "#FAFAFA" }}
+                    itemStyle={{ color: "#FAFAFA" }}
                   />
                   <Area
                     type="monotone"
@@ -111,7 +115,7 @@ export default function BusinessAnalyticsPage() {
               action={data.is_demo && <Badge variant="demo">Demo</Badge>}
             />
             {data.task_completion_over_time.length === 0 ? (
-              <p className="text-sm text-ink-faint">No task activity yet.</p>
+              <p className="text-sm text-night-text-muted">No task activity yet.</p>
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={data.task_completion_over_time}>
@@ -127,8 +131,9 @@ export default function BusinessAnalyticsPage() {
                   <YAxis stroke={CHART_COLORS.text} fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
                     labelFormatter={formatDate}
-                    contentStyle={{ background: "#FFFFFF", border: "1px solid #C8DFCC", borderRadius: 8 }}
-                    labelStyle={{ color: "#0B1810" }}
+                    contentStyle={{ background: "#101B13", border: "1px solid #1E2E22", borderRadius: 8 }}
+                    labelStyle={{ color: "#FAFAFA" }}
+                    itemStyle={{ color: "#FAFAFA" }}
                   />
                   <Bar dataKey="created" fill={CHART_COLORS.muted} radius={[3, 3, 0, 0]} />
                   <Bar dataKey="completed" fill={CHART_COLORS.positive} radius={[3, 3, 0, 0]} />
@@ -144,7 +149,7 @@ export default function BusinessAnalyticsPage() {
               action={data.is_demo && <Badge variant="demo">Demo</Badge>}
             />
             {data.health_score_history.length === 0 ? (
-              <p className="text-sm text-ink-faint">No health scores calculated yet.</p>
+              <p className="text-sm text-night-text-muted">No health scores calculated yet.</p>
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <LineChart data={data.health_score_history}>
@@ -166,8 +171,9 @@ export default function BusinessAnalyticsPage() {
                   />
                   <Tooltip
                     labelFormatter={formatDate}
-                    contentStyle={{ background: "#FFFFFF", border: "1px solid #C8DFCC", borderRadius: 8 }}
-                    labelStyle={{ color: "#0B1810" }}
+                    contentStyle={{ background: "#101B13", border: "1px solid #1E2E22", borderRadius: 8 }}
+                    labelStyle={{ color: "#FAFAFA" }}
+                    itemStyle={{ color: "#FAFAFA" }}
                   />
                   <Line
                     type="monotone"

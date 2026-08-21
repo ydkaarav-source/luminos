@@ -33,7 +33,7 @@ export default function BusinessBuilderPage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-medium mb-1">Business Builder</h1>
-      <p className="text-ink-muted mb-6">
+      <p className="text-night-text-muted mb-6">
         Describe your idea. LuminOS will map the customer, the model, and a 90-day roadmap -
         analysis and recommendations, not guarantees.
       </p>
@@ -62,7 +62,7 @@ export default function BusinessBuilderPage() {
               {Object.entries(plan.overview).map(([key, value]) => (
                 <div key={key}>
                   <dt className="label mb-1">{key.replace(/_/g, " ")}</dt>
-                  <dd className="text-ink-muted">{value}</dd>
+                  <dd className="text-night-text-muted">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -72,11 +72,11 @@ export default function BusinessBuilderPage() {
             <CardHeader title="Launch roadmap" subtitle="First 90 days" />
             <div className="space-y-4">
               {plan.roadmap.map((month) => (
-                <div key={month.month} className="border-l-2 border-accent-soft pl-4">
-                  <p className="text-sm font-medium text-ink">
+                <div key={month.month} className="border-l-2 border-accent/40 pl-4">
+                  <p className="text-sm font-medium text-night-text">
                     Month {month.month}: {month.focus}
                   </p>
-                  <ul className="text-sm text-ink-muted list-disc list-inside mt-1 space-y-0.5">
+                  <ul className="text-sm text-night-text-muted list-disc list-inside mt-1 space-y-0.5">
                     {month.milestones.map((m, i) => (
                       <li key={i}>{m}</li>
                     ))}
@@ -91,7 +91,7 @@ export default function BusinessBuilderPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 text-sm">
               <div>
                 <p className="label mb-2">Daily tasks</p>
-                <ul className="text-ink-muted space-y-1 list-disc list-inside">
+                <ul className="text-night-text-muted space-y-1 list-disc list-inside">
                   {plan.action_plan.daily_tasks.map((t, i) => (
                     <li key={i}>{t}</li>
                   ))}
@@ -99,7 +99,7 @@ export default function BusinessBuilderPage() {
               </div>
               <div>
                 <p className="label mb-2">Weekly goals</p>
-                <ul className="text-ink-muted space-y-1 list-disc list-inside">
+                <ul className="text-night-text-muted space-y-1 list-disc list-inside">
                   {plan.action_plan.weekly_goals.map((t, i) => (
                     <li key={i}>{t}</li>
                   ))}
@@ -107,7 +107,7 @@ export default function BusinessBuilderPage() {
               </div>
               <div>
                 <p className="label mb-2">Milestones</p>
-                <ul className="text-ink-muted space-y-1 list-disc list-inside">
+                <ul className="text-night-text-muted space-y-1 list-disc list-inside">
                   {plan.action_plan.milestones.map((t, i) => (
                     <li key={i}>{t}</li>
                   ))}

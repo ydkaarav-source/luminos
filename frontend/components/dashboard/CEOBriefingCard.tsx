@@ -19,11 +19,11 @@ export function CEOBriefingCard({ briefing }: { briefing: CEOBriefing | null }) 
       />
       {briefing ? (
         <div>
-          <p className="font-display text-sm font-medium text-ink mb-2">{briefing.finding}</p>
-          <p className="text-sm text-ink-muted leading-relaxed">{briefing.recommendation}</p>
+          <p className="font-display text-sm font-medium text-night-text mb-2">{briefing.finding}</p>
+          <p className="text-sm text-night-text-muted leading-relaxed">{briefing.recommendation}</p>
         </div>
       ) : (
-        <p className="text-sm text-ink-faint">Generating today's briefing…</p>
+        <p className="text-sm text-night-text-muted">Generating today's briefing…</p>
       )}
     </Card>
   );

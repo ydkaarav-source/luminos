@@ -45,7 +45,7 @@ export function ChatPanel() {
     <div className="flex flex-col h-[calc(100vh-220px)] card overflow-hidden">
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.length === 0 && (
-          <p className="text-sm text-ink-faint">
+          <p className="text-sm text-night-text-muted">
             Ask your AI CEO assistant anything - it has context on your business, goals, and progress.
           </p>
         )}
@@ -54,19 +54,19 @@ export function ChatPanel() {
             <div
               className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 m.role === "user"
-                  ? "bg-accent text-white rounded-br-sm"
-                  : "bg-panel-raised text-ink rounded-bl-sm"
+                  ? "bg-accent-glow text-night rounded-br-sm"
+                  : "bg-night-card border border-night-border text-night-text rounded-bl-sm"
               }`}
             >
               {m.content}
             </div>
           </div>
         ))}
-        {sending && <p className="text-xs text-ink-faint">Thinking…</p>}
+        {sending && <p className="text-xs text-night-text-muted">Thinking…</p>}
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex gap-2 border-t border-border-subtle p-4">
+      <form onSubmit={handleSubmit} className="flex gap-2 border-t border-night-border p-4">
         <Input
           value={input}
           onChange={(e) => setInput(e.target.value)}

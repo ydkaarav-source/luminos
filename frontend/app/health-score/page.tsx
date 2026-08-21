@@ -56,7 +56,7 @@ export default function HealthScorePage() {
             <h1 className="font-display text-2xl font-medium">Business Health Score</h1>
             {active?.is_demo && <Badge variant="demo">Demo</Badge>}
           </div>
-          <p className="text-ink-muted">A rule-based score, explained in plain language by AI.</p>
+          <p className="text-night-text-muted">A rule-based score, explained in plain language by AI.</p>
         </div>
         <Button onClick={recalculate} disabled={recalculating}>
           {recalculating ? "Recalculating…" : "Recalculate"}
@@ -64,10 +64,10 @@ export default function HealthScorePage() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-ink-faint">Loading…</p>
+        <p className="text-sm text-night-text-muted">Loading…</p>
       ) : !active ? (
         <Card>
-          <p className="text-sm text-ink-muted">
+          <p className="text-sm text-night-text-muted">
             No score yet. Click "Recalculate" to generate your first Business Health Score.
           </p>
         </Card>
@@ -79,21 +79,21 @@ export default function HealthScorePage() {
               {Object.entries(CATEGORY_LABELS).map(([key, label]) => (
                 <div key={key}>
                   <p className="label mb-1">{label}</p>
-                  <p className="text-lg font-display">{active[key as keyof HealthScore] as number}</p>
+                  <p className="text-lg font-display text-night-text">{active[key as keyof HealthScore] as number}</p>
                 </div>
               ))}
             </div>
           </Card>
 
-          <div className="flex gap-1 border-b border-border-subtle">
+          <div className="flex gap-1 border-b border-night-border">
             {ROLES.map((role) => (
               <button
                 key={role.key}
                 onClick={() => setActiveRole(role.key)}
                 className={`px-4 py-2.5 text-sm border-b-2 transition ${
                   activeRole === role.key
-                    ? "border-accent text-ink font-medium"
-                    : "border-transparent text-ink-muted hover:text-ink"
+                    ? "border-accent-bright text-night-text font-medium"
+                    : "border-transparent text-night-text-muted hover:text-night-text"
                 }`}
               >
                 {role.label}
@@ -103,11 +103,11 @@ export default function HealthScorePage() {
 
           {activeExplanation && (
             <div className="space-y-3">
-              {activeRoleMeta && <p className="text-sm text-ink-faint">{activeRoleMeta.description}</p>}
+              {activeRoleMeta && <p className="text-sm text-night-text-muted">{activeRoleMeta.description}</p>}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <Card>
                   <CardHeader title="Strengths" />
-                  <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
+                  <ul className="text-sm text-night-text-muted space-y-1.5 list-disc list-inside">
                     {activeExplanation.strengths.map((s, i) => (
                       <li key={i}>{s}</li>
                     ))}
@@ -115,7 +115,7 @@ export default function HealthScorePage() {
                 </Card>
                 <Card>
                   <CardHeader title="Weaknesses" />
-                  <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
+                  <ul className="text-sm text-night-text-muted space-y-1.5 list-disc list-inside">
                     {activeExplanation.weaknesses.map((s, i) => (
                       <li key={i}>{s}</li>
                     ))}
@@ -123,7 +123,7 @@ export default function HealthScorePage() {
                 </Card>
                 <Card>
                   <CardHeader title="Recommendations" />
-                  <ul className="text-sm text-ink-muted space-y-1.5 list-disc list-inside">
+                  <ul className="text-sm text-night-text-muted space-y-1.5 list-disc list-inside">
                     {activeExplanation.recommendations.map((s, i) => (
                       <li key={i}>{s}</li>
                     ))}

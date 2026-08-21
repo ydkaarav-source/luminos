@@ -49,7 +49,7 @@ export default function RevenuePage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-medium mb-1">Solopreneur Hub — Revenue</h1>
-      <p className="text-ink-muted mb-6">Log revenue to keep your Health Score current.</p>
+      <p className="text-night-text-muted mb-6">Log revenue to keep your Health Score current.</p>
 
       <Card className="mb-5">
         <form onSubmit={handleCreate} className="flex gap-2">
@@ -75,15 +75,15 @@ export default function RevenuePage() {
       <Card>
         <CardHeader title="Revenue entries" subtitle={`Total logged: $${total.toFixed(2)}`} />
         {loading ? (
-          <p className="text-sm text-ink-faint">Loading…</p>
+          <p className="text-sm text-night-text-muted">Loading…</p>
         ) : entries.length === 0 ? (
-          <p className="text-sm text-ink-faint">No revenue logged yet.</p>
+          <p className="text-sm text-night-text-muted">No revenue logged yet.</p>
         ) : (
-          <ul className="divide-y divide-border-subtle">
+          <ul className="divide-y divide-night-border">
             {entries.map((e) => (
               <li key={e.id} className="flex items-center justify-between py-3 text-sm">
-                <span className="text-ink-muted">{e.source ?? "Untitled"}</span>
-                <span className="text-ink font-medium">
+                <span className="text-night-text-muted">{e.source ?? "Untitled"}</span>
+                <span className="text-night-text font-medium">
                   ${Number(e.amount).toFixed(2)} · {new Date(e.entry_date).toLocaleDateString()}
                 </span>
               </li>

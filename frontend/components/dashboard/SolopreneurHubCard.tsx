@@ -9,7 +9,7 @@ export function SolopreneurHubCard({ tasks }: { tasks: Task[] }) {
     <Card>
       <CardHeader title="Solopreneur Hub" subtitle="Your open tasks" />
       {open.length === 0 ? (
-        <p className="text-sm text-ink-faint">No open tasks - nice work.</p>
+        <p className="text-sm text-night-text-muted">No open tasks - nice work.</p>
       ) : (
         <ul className="space-y-2.5">
           {open.map((task) => (
@@ -19,16 +19,16 @@ export function SolopreneurHubCard({ tasks }: { tasks: Task[] }) {
                   task.priority === "high"
                     ? "bg-warning"
                     : task.priority === "medium"
-                    ? "bg-accent"
-                    : "bg-ink-faint"
+                    ? "bg-accent-bright"
+                    : "bg-night-text-muted"
                 }`}
               />
-              <span className="text-ink truncate">{task.title}</span>
+              <span className="text-night-text truncate">{task.title}</span>
             </li>
           ))}
         </ul>
       )}
-      <Link href="/solopreneur-hub/tasks" className="text-xs text-accent hover:text-accent-glow mt-4 inline-block">
+      <Link href="/solopreneur-hub/tasks" className="text-xs text-accent-bright hover:text-night-text mt-4 inline-block">
         View all tasks →
       </Link>
     </Card>

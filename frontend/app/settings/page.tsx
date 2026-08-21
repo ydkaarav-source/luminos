@@ -46,15 +46,15 @@ export default function SettingsPage() {
     <AppShell businessName={business?.name}>
       <h1 className="font-display text-2xl font-medium mb-6">Settings</h1>
 
-      <div className="flex gap-1 border-b border-border-subtle mb-6">
+      <div className="flex gap-1 border-b border-night-border mb-6">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
             className={`px-4 py-2.5 text-sm border-b-2 transition ${
               tab === t.id
-                ? "border-accent text-ink font-medium"
-                : "border-transparent text-ink-muted hover:text-ink"
+                ? "border-accent-bright text-night-text font-medium"
+                : "border-transparent text-night-text-muted hover:text-night-text"
             }`}
           >
             {t.label}
@@ -67,8 +67,8 @@ export default function SettingsPage() {
           <Card>
             <CardHeader title="Account" />
             <div className="space-y-1 text-sm">
-              <p className="text-ink-muted">Name: <span className="text-ink">{user?.name}</span></p>
-              <p className="text-ink-muted">Email: <span className="text-ink">{user?.email}</span></p>
+              <p className="text-night-text-muted">Name: <span className="text-night-text">{user?.name}</span></p>
+              <p className="text-night-text-muted">Email: <span className="text-night-text">{user?.email}</span></p>
             </div>
           </Card>
 

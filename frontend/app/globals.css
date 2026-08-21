@@ -15,30 +15,37 @@
 }
 
 @layer components {
+  /*
+   * Dark by default: the app shell (everything but the landing page)
+   * uses the "night" register established in app/page.tsx's hero. The
+   * landing page never consumes these classes - it builds its own
+   * markup with explicit ink/panel/canvas classes - so this doesn't
+   * touch it.
+   */
   .card {
-    @apply bg-panel border border-border rounded-card shadow-card;
+    @apply bg-night-card border border-night-border rounded-card shadow-card text-night-text;
   }
   .card-raised {
-    @apply bg-panel-raised border border-border rounded-card shadow-card;
+    @apply bg-night-border border border-night-border rounded-card shadow-card text-night-text;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-pill bg-accent text-white
-           px-5 py-2.5 text-sm font-medium transition
-           hover:bg-accent-glow active:scale-[0.98]
+    @apply inline-flex items-center justify-center gap-2 rounded-pill bg-accent-glow text-night
+           px-5 py-2.5 text-sm font-medium shadow-glow transition
+           hover:bg-accent-bright active:scale-[0.98]
            disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-pill bg-panel-raised
-           border border-border text-ink px-5 py-2.5 text-sm font-medium transition
-           hover:border-accent/50 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 rounded-pill bg-transparent
+           border border-night-border text-night-text px-5 py-2.5 text-sm font-medium transition
+           hover:border-accent-bright/50 active:scale-[0.98];
   }
   .input-field {
-    @apply w-full bg-panel-raised border border-border rounded-lg px-4 py-2.5
-           text-sm text-ink placeholder:text-ink-faint outline-none
-           focus:border-accent/60 focus:ring-1 focus:ring-accent/40 transition;
+    @apply w-full bg-night border border-night-border rounded-lg px-4 py-2.5
+           text-sm text-night-text placeholder:text-night-text-muted outline-none
+           focus:border-accent-bright/60 focus:ring-1 focus:ring-accent-bright/40 transition;
   }
   .label {
-    @apply text-xs font-medium text-ink-muted uppercase tracking-wide;
+    @apply text-xs font-medium text-night-text-muted uppercase tracking-wide;
   }
 }
 @keyframes lumin-breathe {

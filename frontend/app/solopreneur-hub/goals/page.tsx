@@ -41,7 +41,7 @@ export default function GoalsPage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-medium mb-1">Solopreneur Hub — Goals</h1>
-      <p className="text-ink-muted mb-6">The outcomes you're steering toward.</p>
+      <p className="text-night-text-muted mb-6">The outcomes you're steering toward.</p>
 
       <Card className="mb-5">
         <form onSubmit={handleCreate} className="flex gap-2">
@@ -55,14 +55,14 @@ export default function GoalsPage() {
       <Card>
         <CardHeader title="Goals" />
         {loading ? (
-          <p className="text-sm text-ink-faint">Loading…</p>
+          <p className="text-sm text-night-text-muted">Loading…</p>
         ) : goals.length === 0 ? (
-          <p className="text-sm text-ink-faint">No goals yet.</p>
+          <p className="text-sm text-night-text-muted">No goals yet.</p>
         ) : (
-          <ul className="divide-y divide-border-subtle">
+          <ul className="divide-y divide-night-border">
             {goals.map((g) => (
               <li key={g.id} className="flex items-center justify-between py-3">
-                <span className="text-sm text-ink">{g.title}</span>
+                <span className="text-sm text-night-text">{g.title}</span>
                 <Badge variant={g.status === "completed" ? "positive" : "medium"}>
                   {g.status.replace("_", " ")}
                 </Badge>

@@ -1,14 +1,14 @@
 const VARIANTS = {
-  low: "bg-panel-raised text-ink-muted",
-  medium: "bg-accent-soft text-accent-glow",
-  high: "bg-warning-soft text-warning",
-  positive: "bg-positive-soft text-positive",
-  demo: "bg-transparent border border-border text-ink-muted",
-  fact: "bg-panel-raised text-ink-muted",
-  decision: "bg-accent-soft text-accent-glow",
-  preference: "bg-transparent border border-border text-ink-muted",
-  completed_milestone: "bg-positive-soft text-positive",
-  note: "bg-panel-raised text-ink-muted",
+  low: "bg-night-border text-night-text-muted",
+  medium: "bg-accent/15 text-accent-bright",
+  high: "bg-warning/15 text-warning",
+  positive: "bg-positive/15 text-positive",
+  demo: "bg-transparent border border-night-border text-night-text-muted",
+  fact: "bg-night-border text-night-text-muted",
+  decision: "bg-accent/15 text-accent-bright",
+  preference: "bg-transparent border border-night-border text-night-text-muted",
+  completed_milestone: "bg-positive/15 text-positive",
+  note: "bg-night-border text-night-text-muted",
 };
 
 export function Badge({

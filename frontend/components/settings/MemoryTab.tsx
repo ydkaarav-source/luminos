@@ -63,19 +63,19 @@ export function MemoryTab() {
         subtitle="What LuminOS remembers about your business - used by the Assistant, CEO Briefing, Business Builder, and Health Score."
       />
       {loading ? (
-        <p className="text-sm text-ink-faint">Loading…</p>
+        <p className="text-sm text-night-text-muted">Loading…</p>
       ) : records.length === 0 ? (
-        <p className="text-sm text-ink-faint">
+        <p className="text-sm text-night-text-muted">
           No memory yet - as you use the Assistant, Business Builder, and onboarding, LuminOS
           will remember key facts, decisions, and preferences here.
         </p>
       ) : (
-        <ul className="divide-y divide-border-subtle">
+        <ul className="divide-y divide-night-border">
           {records.map((record) => (
             <li key={record.id} className="py-3">
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant={record.memory_type}>{formatLabel(record.memory_type)}</Badge>
-                <span className="text-xs text-ink-faint">{formatLabel(record.source)}</span>
+                <span className="text-xs text-night-text-muted">{formatLabel(record.source)}</span>
               </div>
               {editingId === record.id ? (
                 <div className="space-y-2">
@@ -95,17 +95,17 @@ export function MemoryTab() {
                 </div>
               ) : (
                 <div className="flex items-start justify-between gap-3">
-                  <p className="text-sm text-ink flex-1">{record.content}</p>
+                  <p className="text-sm text-night-text flex-1">{record.content}</p>
                   <div className="flex gap-2 shrink-0">
                     <button
                       onClick={() => startEdit(record)}
-                      className="text-xs text-accent hover:text-accent-glow"
+                      className="text-xs text-accent-bright hover:text-night-text"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => deleteRecord(record.id)}
-                      className="text-xs text-ink-faint hover:text-warning"
+                      className="text-xs text-night-text-muted hover:text-warning"
                     >
                       Delete
                     </button>

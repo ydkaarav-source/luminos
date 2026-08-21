@@ -69,7 +69,7 @@ export default function PortfolioPage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-medium mb-1">Analytics</h1>
-      <p className="text-ink-muted mb-2">
+      <p className="text-night-text-muted mb-2">
         Log trades manually for now — live pricing is on the roadmap.
       </p>
       <AnalyticsTabs />
@@ -117,7 +117,7 @@ export default function PortfolioPage() {
       </Card>
 
       {loading ? (
-        <p className="text-sm text-ink-faint">Loading…</p>
+        <p className="text-sm text-night-text-muted">Loading…</p>
       ) : (
         <div className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -133,19 +133,19 @@ export default function PortfolioPage() {
             </Card>
             <Card>
               <CardHeader title="Cost basis (open positions)" />
-              <p className="text-3xl font-display text-ink">{currency(summary?.total_cost_basis ?? 0)}</p>
+              <p className="text-3xl font-display text-night-text">{currency(summary?.total_cost_basis ?? 0)}</p>
             </Card>
           </div>
 
           <Card>
             <CardHeader title="Positions" />
             {!summary || summary.positions.length === 0 ? (
-              <p className="text-sm text-ink-faint">No open positions yet.</p>
+              <p className="text-sm text-night-text-muted">No open positions yet.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-left text-ink-faint text-xs uppercase tracking-wide">
+                    <tr className="text-left text-night-text-muted text-xs uppercase tracking-wide">
                       <th className="pb-2 font-medium">Symbol</th>
                       <th className="pb-2 font-medium">Quantity</th>
                       <th className="pb-2 font-medium">Avg cost</th>
@@ -153,13 +153,13 @@ export default function PortfolioPage() {
                       <th className="pb-2 font-medium">Realized P&L</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-border-subtle">
+                  <tbody className="divide-y divide-night-border">
                     {summary.positions.map((p) => (
                       <tr key={p.symbol}>
-                        <td className="py-2.5 font-medium text-ink">{p.symbol}</td>
-                        <td className="py-2.5 text-ink-muted">{p.quantity}</td>
-                        <td className="py-2.5 text-ink-muted">{currency(p.average_cost)}</td>
-                        <td className="py-2.5 text-ink-muted">{currency(p.total_cost)}</td>
+                        <td className="py-2.5 font-medium text-night-text">{p.symbol}</td>
+                        <td className="py-2.5 text-night-text-muted">{p.quantity}</td>
+                        <td className="py-2.5 text-night-text-muted">{currency(p.average_cost)}</td>
+                        <td className="py-2.5 text-night-text-muted">{currency(p.total_cost)}</td>
                         <td className={`py-2.5 ${p.realized_pl >= 0 ? "text-positive" : "text-danger"}`}>
                           {currency(p.realized_pl)}
                         </td>
@@ -174,22 +174,22 @@ export default function PortfolioPage() {
           <Card>
             <CardHeader title="Trade history" />
             {trades.length === 0 ? (
-              <p className="text-sm text-ink-faint">No trades logged yet.</p>
+              <p className="text-sm text-night-text-muted">No trades logged yet.</p>
             ) : (
-              <ul className="divide-y divide-border-subtle">
+              <ul className="divide-y divide-night-border">
                 {trades.map((t) => (
                   <li key={t.id} className="flex items-center justify-between py-3 text-sm">
                     <div className="flex items-center gap-3">
                       <Badge variant={t.side === "buy" ? "positive" : "high"}>{t.side}</Badge>
-                      <span className="text-ink font-medium">{t.symbol}</span>
-                      <span className="text-ink-muted">
+                      <span className="text-night-text font-medium">{t.symbol}</span>
+                      <span className="text-night-text-muted">
                         {t.quantity} @ {currency(t.price)}
                       </span>
-                      <span className="text-ink-faint">{new Date(t.trade_date).toLocaleDateString()}</span>
+                      <span className="text-night-text-muted">{new Date(t.trade_date).toLocaleDateString()}</span>
                     </div>
                     <button
                       onClick={() => handleDelete(t.id)}
-                      className="text-xs text-ink-faint hover:text-danger transition"
+                      className="text-xs text-night-text-muted hover:text-danger transition"
                     >
                       Remove
                     </button>

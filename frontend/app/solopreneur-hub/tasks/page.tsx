@@ -31,7 +31,7 @@ export default function TasksPage() {
   return (
     <AppShell>
       <h1 className="font-display text-2xl font-medium mb-1">Solopreneur Hub — Tasks</h1>
-      <p className="text-ink-muted mb-6">Everything you need to move today.</p>
+      <p className="text-night-text-muted mb-6">Everything you need to move today.</p>
 
       <Card className="mb-5">
         <form onSubmit={handleCreate} className="flex gap-2">
@@ -50,11 +50,11 @@ export default function TasksPage() {
       <Card>
         <CardHeader title="Tasks" />
         {loading ? (
-          <p className="text-sm text-ink-faint">Loading…</p>
+          <p className="text-sm text-night-text-muted">Loading…</p>
         ) : tasks.length === 0 ? (
-          <p className="text-sm text-ink-faint">No tasks yet - add your first one above.</p>
+          <p className="text-sm text-night-text-muted">No tasks yet - add your first one above.</p>
         ) : (
-          <ul className="divide-y divide-border-subtle">
+          <ul className="divide-y divide-night-border">
             {tasks.map((task) => (
               <li key={task.id} className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3">
@@ -62,9 +62,9 @@ export default function TasksPage() {
                     type="checkbox"
                     checked={task.status === "done"}
                     onChange={() => task.status !== "done" && completeTask(task.id)}
-                    className="h-4 w-4 rounded accent-accent"
+                    className="h-4 w-4 rounded accent-accent-bright"
                   />
-                  <span className={`text-sm ${task.status === "done" ? "line-through text-ink-faint" : "text-ink"}`}>
+                  <span className={`text-sm ${task.status === "done" ? "line-through text-night-text-muted" : "text-night-text"}`}>
                     {task.title}
                   </span>
                   {task.source === "ai_generated" && <Badge variant="medium">AI</Badge>}

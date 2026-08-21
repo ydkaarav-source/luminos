@@ -20,9 +20,9 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="hidden md:flex w-60 shrink-0 flex-col border-r border-border-subtle px-4 py-6">
+    <aside className="relative z-10 hidden md:flex w-60 shrink-0 flex-col border-r border-night-border px-4 py-6">
       <div className="px-2 mb-8">
-        <Logo className="text-lg" />
+        <Logo className="text-lg" variant="dark" />
       </div>
       <nav className="flex flex-col gap-1">
         {NAV_ITEMS.map((item) => {
@@ -33,8 +33,8 @@ export function Sidebar() {
               href={item.href}
               className={`rounded-lg px-3 py-2 text-sm transition ${
                 active
-                  ? "bg-accent-soft text-accent-glow font-medium"
-                  : "text-ink-muted hover:text-ink hover:bg-panel-raised"
+                  ? "bg-accent/15 text-accent-bright font-medium"
+                  : "text-night-text-muted hover:text-night-text hover:bg-night-card"
               }`}
             >
               {item.label}

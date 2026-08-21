@@ -16,8 +16,8 @@ export function CardHeader({
   return (
     <div className="flex items-start justify-between mb-4">
       <div>
-        <h3 className="font-display text-base font-medium text-ink">{title}</h3>
-        {subtitle && <p className="text-sm text-ink-muted mt-0.5">{subtitle}</p>}
+        <h3 className="font-display text-base font-medium text-night-text">{title}</h3>
+        {subtitle && <p className="text-sm text-night-text-muted mt-0.5">{subtitle}</p>}
       </div>
       {action}
     </div>

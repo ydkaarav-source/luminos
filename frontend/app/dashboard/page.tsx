@@ -8,7 +8,7 @@ import { HealthScoreGauge } from "@/components/dashboard/HealthScoreGauge";
 import { SolopreneurHubCard } from "@/components/dashboard/SolopreneurHubCard";
 import { AppShell } from "@/components/layout/AppShell";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
+import { Card, CardHeader } from "@/components/ui/Card";
 import { useBusiness } from "@/hooks/useBusiness";
 import { useHealthScore } from "@/hooks/useHealthScore";
 import { useTasks } from "@/hooks/useTasks";
@@ -32,6 +32,9 @@ export default function DashboardPage() {
     apiClient.get<CEOBriefing>("/ceo-briefing/today").then(setBriefing).catch(() => {});
   }, []);
 
+  const tasksDone = tasks.filter((t) => t.status === "done").length;
+  const completionRate = tasks.length > 0 ? Math.round((tasksDone / tasks.length) * 100) : null;
+
   return (
     <AppShell businessName={business?.name}>
       <div className="mb-8">
@@ -39,46 +42,81 @@ export default function DashboardPage() {
           {greeting()}
           {business ? `, ${business.name}` : ""}.
         </h1>
-        <p className="text-ink-muted mt-1">
+        <p className="text-night-text-muted mt-1">
           {business
             ? `Here's where ${business.name} stands today.`
             : "Setting up your command center…"}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
-        <Card className="lg:col-span-1 flex items-center gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+        <Card>
           {score ? (
             <>
-              <HealthScoreGauge score={score.overall_score} />
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <p className="label">Business Health</p>
-                  {score.is_demo && <Badge variant="demo">Demo</Badge>}
+              <div className="flex items-center gap-5">
+                <HealthScoreGauge score={score.overall_score} />
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="label">Business Health</p>
+                    {score.is_demo && <Badge variant="demo">Demo</Badge>}
+                  </div>
+                  <p className="text-sm text-night-text-muted">
+                    {score.overall_score >= 75
+                      ? "Strong across the board."
+                      : score.overall_score >= 50
+                      ? "Solid, with room to grow."
+                      : "A few areas need attention."}
+                  </p>
                 </div>
-                <p className="text-sm text-ink-muted">
-                  {score.overall_score >= 75
-                    ? "Strong across the board."
-                    : score.overall_score >= 50
-                    ? "Solid, with room to grow."
-                    : "A few areas need attention."}
-                </p>
+              </div>
+              <div className="mt-5 pt-5 border-t border-night-border grid grid-cols-3 gap-3 text-center">
+                <div>
+                  <p className="text-lg font-medium text-accent-bright">{score.revenue_score}</p>
+                  <p className="text-xs text-night-text-muted mt-0.5">Revenue score</p>
+                </div>
+                <div>
+                  <p className="text-lg font-medium text-accent-bright">
+                    {tasksDone}/{tasks.length}
+                  </p>
+                  <p className="text-xs text-night-text-muted mt-0.5">Tasks done</p>
+                </div>
+                <div>
+                  <p className="text-lg font-medium text-accent-bright">
+                    {completionRate === null ? "—" : `${completionRate}%`}
+                  </p>
+                  <p className="text-xs text-night-text-muted mt-0.5">Completion rate</p>
+                </div>
               </div>
             </>
           ) : (
             <div className="w-full text-center py-4">
-              <p className="text-sm text-ink-faint mb-3">No health score yet.</p>
+              <p className="text-sm text-night-text-muted mb-3">No health score yet.</p>
             </div>
           )}
         </Card>
 
-        <div className="lg:col-span-2">
-          <CEOBriefingCard briefing={briefing} />
-        </div>
+        <CEOBriefingCard briefing={briefing} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         <SolopreneurHubCard tasks={tasks} />
+
+        <Card>
+          <CardHeader title="This week" />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-night-text-muted">Revenue score</span>
+              <span className="text-sm font-medium text-night-text">
+                {score ? `${score.revenue_score} / 100` : "—"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-night-text-muted">Tasks completed</span>
+              <span className="text-sm font-medium text-night-text">{tasksDone}</span>
+            </div>
+          </div>
+        </Card>
+
         <BusinessBuilderCard />
       </div>
     </AppShell>
