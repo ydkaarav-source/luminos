@@ -141,7 +141,7 @@ export default function OnboardingPage() {
           current_challenges: challengesText.split(",").map((s) => s.trim()).filter(Boolean),
         });
         await apiClient.post("/onboarding/complete");
-        router.push("/dashboard");
+        router.push("/workspace");
         return;
       }
       setStepIndex((i) => i + 1);
@@ -153,7 +153,7 @@ export default function OnboardingPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12">
+    <main className="min-h-screen flex items-center justify-center px-6 py-12 bg-night text-night-text">
       <Card className="w-full max-w-lg">
         <div className="flex gap-1.5 mb-6">
           {STEPS.map((s, i) => (

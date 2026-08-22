@@ -10,7 +10,7 @@ export function BusinessBuilderCard() {
         Describe a business idea and get a target customer analysis, revenue
         model, launch roadmap, and action plan generated for you.
       </p>
-      <Link href="/business-builder">
+      <Link href="/workspace?tab=business-builder">
         <Button className="w-full">Generate a plan</Button>
       </Link>
     </Card>

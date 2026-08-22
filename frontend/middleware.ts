@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // UX-layer guard only. The backend re-validates the JWT on every request
 // (see auth_dependencies.get_current_user) - that is the real boundary.
-const PROTECTED_PREFIXES = ["/dashboard", "/business-builder", "/ceo-briefing", "/health-score", "/solopreneur-hub", "/assistant", "/settings"];
+const PROTECTED_PREFIXES = ["/workspace", "/dashboard", "/business-builder", "/ceo-briefing", "/health-score", "/solopreneur-hub", "/assistant", "/settings"];
 const AUTH_PREFIXES = ["/login", "/signup"];
 
 export function middleware(request: NextRequest) {
@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (isAuthPage && hasSession) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/workspace", request.url));
   }
 
   return NextResponse.next();
@@ -25,6 +25,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/workspace/:path*",
     "/dashboard/:path*",
     "/business-builder/:path*",
     "/ceo-briefing/:path*",

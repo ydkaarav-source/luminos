@@ -28,7 +28,7 @@ export function SolopreneurHubCard({ tasks }: { tasks: Task[] }) {
           ))}
         </ul>
       )}
-      <Link href="/solopreneur-hub/tasks" className="text-xs text-accent-bright hover:text-night-text mt-4 inline-block">
+      <Link href="/workspace?tab=solopreneur-hub&subtab=tasks" className="text-xs text-accent-bright hover:text-night-text mt-4 inline-block">
         View all tasks →
       </Link>
     </Card>

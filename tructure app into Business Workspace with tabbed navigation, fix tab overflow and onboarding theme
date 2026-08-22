@@ -1,0 +1,5 @@
+[33mcommit a634d51f7e06fc194608bab76192a9d645d3a147[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Aarav <you@example.com>
+Date:   Fri Aug 21 18:18:06 2026 -0400
+
+    Rebuild app theme to match landing page dark/glow style, restructure Dashboard layout

@@ -6,13 +6,7 @@ import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/business-builder", label: "Business Builder" },
-  { href: "/ceo-briefing", label: "CEO Briefing" },
-  { href: "/health-score", label: "Health Score" },
-  { href: "/solopreneur-hub/tasks", label: "Solopreneur Hub" },
-  { href: "/analytics/business", label: "Analytics" },
-  { href: "/assistant", label: "AI Assistant" },
+  { href: "/workspace", label: "Workspace" },
   { href: "/settings", label: "Settings" },
 ];
 

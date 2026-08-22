@@ -16,7 +16,7 @@ export function useAuth() {
     setError(null);
     try {
       const user = await apiClient.post<User>("/auth/signup", { email, password, name });
-      router.push(user.onboarding_completed ? "/dashboard" : "/onboarding");
+      router.push(user.onboarding_completed ? "/workspace" : "/onboarding");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong.");
     } finally {
@@ -29,7 +29,7 @@ export function useAuth() {
     setError(null);
     try {
       const user = await apiClient.post<User>("/auth/login", { email, password });
-      router.push(user.onboarding_completed ? "/dashboard" : "/onboarding");
+      router.push(user.onboarding_completed ? "/workspace" : "/onboarding");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong.");
     } finally {
