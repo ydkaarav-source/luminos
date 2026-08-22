@@ -1,10 +1,14 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import AnyHttpUrl, BaseModel
 
 
 class WebsiteBriefGenerateRequest(BaseModel):
     pass
+
+
+class WebsiteScrapeRequest(BaseModel):
+    url: AnyHttpUrl
 
 
 class TargetPage(BaseModel):
@@ -21,3 +25,8 @@ class WebsiteBriefOut(BaseModel):
     site_url: str | None
 
     model_config = {"from_attributes": True}
+
+
+class WebsiteScrapeResponse(BaseModel):
+    brief: WebsiteBriefOut
+    content_preview: str

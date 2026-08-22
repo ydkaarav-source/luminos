@@ -9,7 +9,12 @@ from app.dependencies.db_dependencies import get_db
 from app.models.business import Business
 from app.models.user import User
 from app.schemas.common import Envelope, ResponseMeta
-from app.schemas.website_brief import WebsiteBriefGenerateRequest, WebsiteBriefOut
+from app.schemas.website_brief import (
+    WebsiteBriefGenerateRequest,
+    WebsiteBriefOut,
+    WebsiteScrapeRequest,
+    WebsiteScrapeResponse,
+)
 from app.services.website_brief_service import WebsiteBriefService
 
 router = APIRouter(prefix="/website-brief", tags=["website-brief"])
@@ -37,3 +42,16 @@ def latest(business: Business = Depends(require_active_business), db: Session = 
     if not brief:
         raise NotFoundError("No website brief generated yet.")
     return _envelope(WebsiteBriefOut.model_validate(brief))
+
+
+@router.post("/scrape-site", response_model=Envelope[WebsiteScrapeResponse])
+async def scrape_site(
+    payload: WebsiteScrapeRequest,
+    business: Business = Depends(require_active_business),
+    db: Session = Depends(get_db),
+):
+    brief, content = await WebsiteBriefService(db).scrape_site(business, str(payload.url))
+    preview = content[:300] + "…" if len(content) > 300 else content
+    return _envelope(
+        WebsiteScrapeResponse(brief=WebsiteBriefOut.model_validate(brief), content_preview=preview)
+    )

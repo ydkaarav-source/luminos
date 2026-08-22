@@ -44,6 +44,11 @@ class AIProviderError(LuminOSError):
     status_code = status.HTTP_502_BAD_GATEWAY
 
 
+class WebsiteUnreachableError(LuminOSError):
+    code = "WEBSITE_UNREACHABLE"
+    status_code = status.HTTP_502_BAD_GATEWAY
+
+
 def _envelope(code: str, message: str, details: dict | None = None) -> dict:
     return {"error": {"code": code, "message": message, "details": details or {}}}
 

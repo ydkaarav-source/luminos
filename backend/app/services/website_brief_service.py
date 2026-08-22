@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import NotFoundError
 from app.models.ai_conversation import ConversationContext
 from app.models.business import Business
 from app.models.business_plan import BusinessPlan
@@ -10,6 +11,7 @@ from app.models.website_brief import WebsiteBrief
 from app.repositories.business_profile_repository import BusinessProfileRepository
 from app.services.ai.ai_orchestrator import AIOrchestrator
 from app.services.ai.prompt_templates import website_brief as prompt_template
+from app.services.website_scraper_service import WebsiteScraperService
 
 
 class WebsiteBriefService:
@@ -17,6 +19,7 @@ class WebsiteBriefService:
         self.db = db
         self.ai = AIOrchestrator(db)
         self.profile_repo = BusinessProfileRepository(db)
+        self.scraper = WebsiteScraperService()
 
     async def generate_brief(self, business: Business, user_id: UUID) -> WebsiteBrief:
         memory_lines = self.ai.get_memory_context(
@@ -83,3 +86,33 @@ class WebsiteBriefService:
             .order_by(WebsiteBrief.created_at.desc())
             .first()
         )
+
+    async def scrape_site(self, business: Business, url: str) -> tuple[WebsiteBrief, str]:
+        """
+        Fetches the founder's real, live site and records what was
+        actually found. Raises WebsiteUnreachableError (via the
+        scraper) on any failure - nothing is written to site_url or
+        memory_records unless the fetch genuinely succeeded.
+        """
+        brief = self.get_latest(business.id)
+        if not brief:
+            raise NotFoundError("Generate a website brief before checking your site.")
+
+        content = await self.scraper.scrape(url)
+
+        brief.site_url = url
+        self.db.add(brief)
+        self.db.commit()
+        self.db.refresh(brief)
+
+        # Real content pulled from the founder's own live site - a
+        # distinct kind of fact from the AI-generated brief above, so it
+        # gets its own MemorySource rather than being conflated with it.
+        self.ai.remember(
+            business.id,
+            f"Real content found on the founder's live site ({url}): {content}",
+            MemoryType.FACT,
+            MemorySource.SCRAPED_SITE_CONTENT,
+        )
+
+        return brief, content
