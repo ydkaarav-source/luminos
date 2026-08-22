@@ -22,6 +22,7 @@ class MemorySource(str, enum.Enum):
     ONBOARDING = "onboarding"
     ASSISTANT_CHAT = "assistant_chat"
     BUSINESS_BUILDER = "business_builder"
+    WEBSITE_BRIEF = "website_brief"
     USER_MANUAL = "user_manual"
     SYSTEM_INFERRED = "system_inferred"
 

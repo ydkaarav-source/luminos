@@ -16,6 +16,7 @@ from app.api.v1 import (
     revenue,
     tasks,
     trades,
+    website_brief,
 )
 
 api_router = APIRouter()
@@ -30,6 +31,7 @@ api_router.include_router(tasks.router)
 api_router.include_router(revenue.router)
 api_router.include_router(health_score.router)
 api_router.include_router(business_builder.router)
+api_router.include_router(website_brief.router)
 api_router.include_router(ceo_briefing.router)
 api_router.include_router(assistant.router)
 api_router.include_router(trades.router)

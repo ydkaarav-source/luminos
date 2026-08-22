@@ -21,6 +21,7 @@ class ConversationContext(str, enum.Enum):
     BUSINESS_BUILDER = "business_builder"
     CEO_BRIEFING = "ceo_briefing"
     HEALTH_SCORE = "health_score"
+    WEBSITE_BRIEF = "website_brief"
 
 
 class AIConversation(Base, UUIDPrimaryKeyMixin):
