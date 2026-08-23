@@ -1,0 +1,23 @@
+import uuid
+from datetime import datetime
+
+from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.db.base import Base
+from app.models.mixins import UUIDPrimaryKeyMixin
+
+
+class PasswordResetToken(Base, UUIDPrimaryKeyMixin):
+    __tablename__ = "password_reset_tokens"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        PG_UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    # SHA-256 hex digest of the actual token - never the raw token itself,
+    # same principle this app already applies to passwords (see
+    # core/security.py's hash_password).
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

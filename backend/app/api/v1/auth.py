@@ -7,7 +7,14 @@ from app.core.config import settings
 from app.dependencies.auth_dependencies import get_current_user
 from app.dependencies.db_dependencies import get_db
 from app.models.user import User
-from app.schemas.auth import LoginRequest, SignupRequest, UserOut
+from app.schemas.auth import (
+    ForgotPasswordRequest,
+    ForgotPasswordResponse,
+    LoginRequest,
+    ResetPasswordRequest,
+    SignupRequest,
+    UserOut,
+)
 from app.schemas.common import Envelope, ResponseMeta
 from app.services.auth_service import AuthService
 
@@ -61,3 +68,30 @@ def me(current_user: User = Depends(get_current_user)):
         data=UserOut.model_validate(current_user),
         meta=ResponseMeta(generated_at=datetime.now(timezone.utc)),
     )
+
+
+_GENERIC_RESET_MESSAGE = "If an account with that email exists, we've sent password reset instructions."
+
+
+@router.post("/forgot-password", response_model=Envelope[ForgotPasswordResponse])
+def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    service = AuthService(db)
+    raw_token = service.request_password_reset(payload.email)
+
+    data = ForgotPasswordResponse(message=_GENERIC_RESET_MESSAGE)
+    if raw_token and settings.ENVIRONMENT != "production":
+        # No email delivery exists anywhere in this codebase yet (checked
+        # before writing this - see the final report). TODO: send this via
+        # a real transactional email provider before this is usable by
+        # real production users; until then, non-production responses
+        # carry the raw link directly so local dev/testing works.
+        data.reset_token = raw_token
+        data.reset_url = f"{settings.FRONTEND_URL}/reset-password?token={raw_token}"
+
+    return Envelope(data=data, meta=ResponseMeta(generated_at=datetime.now(timezone.utc)))
+
+
+@router.post("/reset-password")
+def reset_password(payload: ResetPasswordRequest, db: Session = Depends(get_db)):
+    AuthService(db).reset_password(payload.token, payload.new_password)
+    return Envelope(data={"reset": True}, meta=ResponseMeta(generated_at=datetime.now(timezone.utc)))

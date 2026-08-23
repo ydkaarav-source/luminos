@@ -21,3 +21,24 @@ class UserOut(BaseModel):
     onboarding_completed: bool
 
     model_config = {"from_attributes": True}
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordResponse(BaseModel):
+    message: str
+    # Only populated outside production, where no real email delivery
+    # exists yet - see AuthService.request_password_reset.
+    reset_token: str | None = None
+    reset_url: str | None = None
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8)
+
+
+class DeleteAccountRequest(BaseModel):
+    password: str

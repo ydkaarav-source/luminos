@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
 from app.dependencies.auth_dependencies import get_current_user, require_active_business
@@ -8,8 +8,10 @@ from app.dependencies.db_dependencies import get_db
 from app.models.business import Business
 from app.models.user import User
 from app.repositories.business_repository import BusinessRepository
+from app.schemas.auth import DeleteAccountRequest
 from app.schemas.business import BusinessOut, BusinessUpdateRequest
 from app.schemas.common import Envelope, ResponseMeta
+from app.services.auth_service import AuthService
 
 router = APIRouter(prefix="/businesses", tags=["businesses"])
 
@@ -39,3 +41,19 @@ def update_active(
         setattr(business, field, value)
     business = BusinessRepository(db).save(business)
     return _envelope(BusinessOut.model_validate(business))
+
+
+@router.delete("/active/delete-account")
+def delete_account(
+    payload: DeleteAccountRequest,
+    response: Response,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # get_current_user, not require_active_business - deleting your own
+    # account must work even if you never finished onboarding and have
+    # no active business yet.
+    AuthService(db).delete_account(current_user, payload.password)
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
+    return _envelope({"deleted": True})

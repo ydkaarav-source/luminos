@@ -1,6 +1,7 @@
 """
 Password hashing and JWT issuance/verification.
 """
+import hashlib
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from uuid import UUID
@@ -50,3 +51,14 @@ def decode_token(token: str) -> Optional[dict]:
         return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
     except JWTError:
         return None
+
+
+def hash_reset_token(raw_token: str) -> str:
+    """
+    SHA-256, not bcrypt - unlike a user-chosen password, a password reset
+    token is a long, high-entropy random value (secrets.token_urlsafe),
+    so it doesn't need bcrypt's deliberately slow, salted hashing to
+    resist brute force. This only needs to be irreversible, so a stolen
+    DB row can't be turned back into a usable token.
+    """
+    return hashlib.sha256(raw_token.encode("utf-8")).hexdigest()
