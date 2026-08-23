@@ -4,6 +4,8 @@ versioned API router. Run with:
 
     uvicorn app.main:app --reload
 """
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,14 +14,24 @@ from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
 from app.core.rate_limit import limiter
+from app.core.scheduler import scheduler, start_scheduler
 from app.db import model_registry  # noqa: F401 - populates Base.metadata at startup
 from app.middleware.request_logging import RequestLoggingMiddleware
 configure_logging()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()  # automatic Stripe sync - see core/scheduler.py
+    yield
+    scheduler.shutdown()
+
 
 app = FastAPI(
     title=settings.APP_NAME,
     description="The AI operating system for entrepreneurs.",
     version="0.1.0",
+    lifespan=lifespan,
 )
 app.state.limiter = limiter
 

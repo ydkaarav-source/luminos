@@ -1,6 +1,6 @@
 import type { ApiEnvelope, ApiErrorEnvelope } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/v1";
 
 export class ApiError extends Error {
   code: string;
@@ -54,5 +54,5 @@ export const apiClient = {
   post: <T>(path: string, body?: unknown) => request<T>(path, { method: "POST", body }),
   put: <T>(path: string, body?: unknown) => request<T>(path, { method: "PUT", body }),
   patch: <T>(path: string, body?: unknown) => request<T>(path, { method: "PATCH", body }),
-  delete: <T>(path: string) => request<T>(path, { method: "DELETE" }),
+  delete: <T>(path: string, body?: unknown) => request<T>(path, { method: "DELETE", body }),
 };

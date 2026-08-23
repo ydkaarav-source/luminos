@@ -9,6 +9,12 @@ export interface User {
   onboarding_completed: boolean;
 }
 
+export interface ForgotPasswordResponse {
+  message: string;
+  reset_token?: string | null;
+  reset_url?: string | null;
+}
+
 export type BusinessStage = "idea" | "building" | "operating" | "growing";
 export type BusinessType =
   | "ecommerce"

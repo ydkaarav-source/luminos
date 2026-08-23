@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/layout/AppShell";
@@ -7,7 +8,7 @@ import { MemoryTab } from "@/components/settings/MemoryTab";
 import { Button } from "@/components/ui/Button";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { apiClient } from "@/lib/api-client";
+import { apiClient, ApiError } from "@/lib/api-client";
 import type { Business, User } from "@/lib/types";
 
 const TABS = [
@@ -18,11 +19,16 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [business, setBusiness] = useState<Business | null>(null);
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<TabId>("account");
+
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     apiClient.get<User>("/auth/me").then(setUser);
@@ -39,6 +45,26 @@ export default function SettingsPage() {
       setBusiness(updated);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function deleteAccount() {
+    if (
+      !window.confirm(
+        "This permanently deletes your account, your business, and all its data. This cannot be undone. Continue?"
+      )
+    ) {
+      return;
+    }
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await apiClient.delete("/businesses/active/delete-account", { password: deletePassword });
+      router.push("/");
+    } catch (err) {
+      setDeleteError(err instanceof ApiError ? err.message : "Something went wrong.");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -78,6 +104,33 @@ export default function SettingsPage() {
               <Input value={name} onChange={(e) => setName(e.target.value)} />
               <Button onClick={save} disabled={saving}>
                 {saving ? "Saving…" : "Save"}
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="border-danger/40 bg-danger/5">
+            <CardHeader
+              title="Delete account"
+              subtitle="Permanently deletes your account, your business, and all associated data - tasks, revenue, memory, connected Stripe accounts, everything. This cannot be undone."
+            />
+            <div className="space-y-3">
+              <div>
+                <label className="label block mb-1.5">Confirm your password</label>
+                <Input
+                  type="password"
+                  value={deletePassword}
+                  onChange={(e) => setDeletePassword(e.target.value)}
+                  placeholder="Current password"
+                />
+              </div>
+              {deleteError && <p className="text-sm text-danger">{deleteError}</p>}
+              <Button
+                variant="secondary"
+                className="border-danger text-danger hover:bg-danger/10"
+                onClick={deleteAccount}
+                disabled={deleting || !deletePassword}
+              >
+                {deleting ? "Deleting…" : "Delete my account"}
               </Button>
             </div>
           </Card>

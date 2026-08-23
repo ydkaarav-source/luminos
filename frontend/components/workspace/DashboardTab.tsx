@@ -39,7 +39,7 @@ export function DashboardTab() {
       <div className="mb-8">
         <h1 className="font-display text-2xl font-medium">
           {greeting()}
-          {business ? `, ${business.name}` : ""}.
+          {business?.name ? `, ${business.name}` : ""}.
         </h1>
         <p className="text-night-text-muted mt-1">
           {business

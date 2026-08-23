@@ -18,7 +18,7 @@ import {
 import { AnalyticsTabs } from "@/components/analytics/AnalyticsTabs";
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardHeader } from "@/components/ui/Card";
-import { apiClient } from "@/lib/api-client";
+import { API_URL, apiClient } from "@/lib/api-client";
 import type { BusinessAnalytics } from "@/lib/types";
 
 // Brighter than the light-mode tokens (#16A34A/#15803D/#C8DFCC/#3E5745) -
@@ -55,6 +55,15 @@ export function BusinessView() {
       <h1 className="font-display text-2xl font-medium mb-1">Analytics</h1>
       <p className="text-night-text-muted mb-2">A closer look at how your business is trending.</p>
       <AnalyticsTabs />
+
+      <div className="flex flex-wrap gap-3 mb-5">
+        <a href={`${API_URL}/analytics/export/tasks`} className="btn-secondary">
+          Export tasks (CSV)
+        </a>
+        <a href={`${API_URL}/analytics/export/revenue`} className="btn-secondary">
+          Export revenue (CSV)
+        </a>
+      </div>
 
       {loading ? (
         <p className="text-sm text-night-text-muted">Loading…</p>
