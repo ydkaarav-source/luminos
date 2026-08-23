@@ -9,7 +9,9 @@ import { BusinessBuilderTab } from "@/components/workspace/BusinessBuilderTab";
 import { CEOBriefingTab } from "@/components/workspace/CEOBriefingTab";
 import { DashboardTab } from "@/components/workspace/DashboardTab";
 import { HealthScoreTab } from "@/components/workspace/HealthScoreTab";
+import { RevenueTab } from "@/components/workspace/RevenueTab";
 import { SolopreneurHubTab } from "@/components/workspace/SolopreneurHubTab";
+import { WebsiteBriefTab } from "@/components/workspace/WebsiteBriefTab";
 import { WorkspaceTabs } from "@/components/workspace/WorkspaceTabs";
 import { useBusiness } from "@/hooks/useBusiness";
 
@@ -17,6 +19,8 @@ function TabContent({ tab }: { tab: string }) {
   switch (tab) {
     case "business-builder":
       return <BusinessBuilderTab />;
+    case "website":
+      return <WebsiteBriefTab />;
     case "ceo-briefing":
       return <CEOBriefingTab />;
     case "health-score":
@@ -25,6 +29,8 @@ function TabContent({ tab }: { tab: string }) {
       return <SolopreneurHubTab />;
     case "analytics":
       return <AnalyticsTab />;
+    case "revenue":
+      return <RevenueTab />;
     case "assistant":
       return <AssistantTab />;
     default:

@@ -16,3 +16,4 @@ from app.models.ai_insight import AIInsight  # noqa: F401
 from app.models.memory_record import MemoryRecord  # noqa: F401
 from app.models.trade import Trade  # noqa: F401
 from app.models.website_brief import WebsiteBrief  # noqa: F401
+from app.models.stripe_connection import StripeConnection  # noqa: F401

@@ -9,6 +9,8 @@ const VARIANTS = {
   preference: "bg-transparent border border-night-border text-night-text-muted",
   completed_milestone: "bg-positive/15 text-positive",
   note: "bg-night-border text-night-text-muted",
+  manual: "bg-night-border text-night-text-muted",
+  stripe: "bg-positive/15 text-positive",
 };
 
 export function Badge({

@@ -14,6 +14,7 @@ from app.api.v1 import (
     onboarding,
     projects,
     revenue,
+    stripe,
     tasks,
     trades,
     website_brief,
@@ -29,6 +30,7 @@ api_router.include_router(goals.router)
 api_router.include_router(projects.router)
 api_router.include_router(tasks.router)
 api_router.include_router(revenue.router)
+api_router.include_router(stripe.router)
 api_router.include_router(health_score.router)
 api_router.include_router(business_builder.router)
 api_router.include_router(website_brief.router)

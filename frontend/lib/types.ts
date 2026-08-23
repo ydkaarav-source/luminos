@@ -123,6 +123,25 @@ export interface BusinessPlan {
   status: "draft" | "active" | "archived";
 }
 
+export interface TargetPage {
+  name: string;
+  purpose: string;
+}
+
+export interface WebsiteBrief {
+  id: string;
+  title: string;
+  target_pages: TargetPage[];
+  copy_direction: string;
+  design_direction: string;
+  site_url: string | null;
+}
+
+export interface WebsiteScrapeResult {
+  brief: WebsiteBrief;
+  content_preview: string;
+}
+
 export interface AssistantMessage {
   role: "user" | "assistant" | "system";
   content: string;
@@ -165,6 +184,8 @@ export type MemorySource =
   | "onboarding"
   | "assistant_chat"
   | "business_builder"
+  | "website_brief"
+  | "scraped_site_content"
   | "user_manual"
   | "system_inferred";
 
@@ -201,4 +222,31 @@ export interface PortfolioSummary {
   positions: Position[];
   total_realized_pl: number;
   total_cost_basis: number;
+}
+
+export type RevenueEntryOrigin = "manual" | "stripe";
+
+export interface RevenueEntry {
+  id: string;
+  amount: number;
+  currency: string;
+  source: string | null;
+  entry_date: string;
+  notes: string | null;
+  origin: RevenueEntryOrigin;
+}
+
+export interface StripeConnectUrl {
+  url: string;
+}
+
+export interface StripeStatus {
+  connected: boolean;
+  connected_at: string | null;
+  stripe_account_id: string | null;
+}
+
+export interface StripeSyncResult {
+  synced_count: number;
+  total_fetched: number;
 }

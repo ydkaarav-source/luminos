@@ -35,6 +35,17 @@ class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
 
+    # --- Stripe Connect ---
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_CONNECT_CLIENT_ID: str = ""
+    # Must exactly match a redirect URI registered in the Stripe dashboard.
+    # Different per environment (local vs Railway in production), so this
+    # is env-driven rather than hardcoded.
+    STRIPE_OAUTH_REDIRECT_URI: str = "http://localhost:8000/api/v1/stripe/oauth/callback"
+    # Where the OAuth callback sends the founder's browser back to after
+    # Stripe redirects here - also environment-specific (Vercel in prod).
+    FRONTEND_URL: str = "http://localhost:3000"
+
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 

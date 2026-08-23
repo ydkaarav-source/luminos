@@ -6,10 +6,12 @@ import { useSearchParams } from "next/navigation";
 const TABS = [
   { value: "dashboard", label: "Dashboard" },
   { value: "business-builder", label: "Business Builder" },
+  { value: "website", label: "Website" },
   { value: "ceo-briefing", label: "CEO Briefing" },
   { value: "health-score", label: "Health Score" },
   { value: "solopreneur-hub", label: "Solopreneur Hub" },
   { value: "analytics", label: "Analytics" },
+  { value: "revenue", label: "Revenue" },
   { value: "assistant", label: "AI Assistant" },
 ];
 

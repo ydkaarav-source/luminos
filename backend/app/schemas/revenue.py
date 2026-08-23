@@ -3,6 +3,8 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from app.models.revenue_entry import RevenueEntryOrigin
+
 
 class RevenueEntryCreateRequest(BaseModel):
     amount: float = Field(gt=0)
@@ -19,5 +21,6 @@ class RevenueEntryOut(BaseModel):
     source: str | None
     entry_date: date
     notes: str | None
+    origin: RevenueEntryOrigin
 
     model_config = {"from_attributes": True}
