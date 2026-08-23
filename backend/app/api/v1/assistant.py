@@ -1,8 +1,9 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
+from app.core.rate_limit import limiter
 from app.dependencies.auth_dependencies import get_current_user, require_active_business
 from app.dependencies.db_dependencies import get_db
 from app.models.business import Business
@@ -25,7 +26,9 @@ def conversations(business: Business = Depends(require_active_business), db: Ses
 
 
 @router.post("/message", response_model=Envelope[AssistantMessageOut])
+@limiter.limit("20/hour")
 async def send_message(
+    request: Request,
     payload: AssistantMessageRequest,
     business: Business = Depends(require_active_business),
     current_user: User = Depends(get_current_user),

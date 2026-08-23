@@ -11,6 +11,7 @@ from app.api.v1.router import api_router
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
+from app.core.rate_limit import limiter
 from app.db import model_registry  # noqa: F401 - populates Base.metadata at startup
 from app.middleware.request_logging import RequestLoggingMiddleware
 configure_logging()
@@ -20,6 +21,7 @@ app = FastAPI(
     description="The AI operating system for entrepreneurs.",
     version="0.1.0",
 )
+app.state.limiter = limiter
 
 app.add_middleware(
     CORSMiddleware,

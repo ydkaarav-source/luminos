@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError
+from app.core.rate_limit import limiter
 from app.dependencies.auth_dependencies import get_current_user, require_active_business
 from app.dependencies.db_dependencies import get_db
 from app.models.business import Business
@@ -21,7 +22,9 @@ def _envelope(data):
 
 
 @router.post("/generate", response_model=Envelope[BusinessPlanOut])
+@limiter.limit("5/hour")
 async def generate(
+    request: Request,
     payload: BusinessBuilderGenerateRequest,
     business: Business = Depends(require_active_business),
     current_user: User = Depends(get_current_user),

@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError
+from app.core.rate_limit import is_demo_request, limiter
 from app.dependencies.auth_dependencies import get_current_user, require_active_business
 from app.dependencies.db_dependencies import get_db
 from app.models.ai_insight import AIInsight
@@ -24,7 +25,9 @@ def _envelope(data):
 
 
 @router.get("/today", response_model=Envelope[CEOBriefingOut])
+@limiter.limit("5/hour", exempt_when=is_demo_request)
 async def today(
+    request: Request,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):

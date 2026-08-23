@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import NotFoundError
+from app.core.rate_limit import limiter
 from app.dependencies.auth_dependencies import get_current_user, require_active_business
 from app.dependencies.db_dependencies import get_db
 from app.models.business import Business
@@ -40,7 +41,9 @@ def history(business: Business = Depends(require_active_business), db: Session =
 
 
 @router.post("/recalculate", response_model=Envelope[HealthScoreOut])
+@limiter.limit("10/hour")
 async def recalculate(
+    request: Request,
     business: Business = Depends(require_active_business),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
