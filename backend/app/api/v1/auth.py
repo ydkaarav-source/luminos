@@ -22,7 +22,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 _is_production = settings.ENVIRONMENT == "production"
 COOKIE_KWARGS = dict(
     httponly=True,
-    secure=True,
+    secure=_is_production,
     samesite="none" if _is_production else "lax",
 )
 
