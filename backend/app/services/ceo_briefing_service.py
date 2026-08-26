@@ -5,6 +5,8 @@ from uuid import UUID
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import GoogleCalendarError
+from app.core.logging import get_logger
 from app.models.ai_conversation import ConversationContext
 from app.models.ai_insight import AIInsight, InsightPriority, InsightType
 from app.models.business import Business
@@ -13,7 +15,10 @@ from app.models.task import Task, TaskStatus
 from app.repositories.business_profile_repository import BusinessProfileRepository
 from app.services.ai.ai_orchestrator import AIOrchestrator
 from app.services.ai.prompt_templates import ceo_briefing as prompt_template
+from app.services.google_calendar_service import GoogleCalendarService
 from app.services.health_score_service import HealthScoreService
+
+logger = get_logger(__name__)
 
 
 class CEOBriefingService:
@@ -22,6 +27,7 @@ class CEOBriefingService:
         self.ai = AIOrchestrator(db)
         self.health_score_service = HealthScoreService(db)
         self.business_profiles = BusinessProfileRepository(db)
+        self.google_calendar = GoogleCalendarService(db)
 
     def get_today(self, business_id: UUID) -> AIInsight | None:
         today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -50,7 +56,7 @@ class CEOBriefingService:
         if existing:
             return existing
 
-        metrics = self._gather_metrics(business)
+        metrics = await self._gather_metrics(business)
 
         memory_lines = self.ai.get_memory_context(business.id)
         system_prompt, user_prompt = prompt_template.build_prompt(business.name, metrics, memory_lines)
@@ -91,7 +97,7 @@ class CEOBriefingService:
         self.db.refresh(insight)
         return insight
 
-    def _gather_metrics(self, business: Business) -> dict:
+    async def _gather_metrics(self, business: Business) -> dict:
         """
         All the real numbers behind today's briefing, computed here so the
         AI reasons about them rather than estimating them itself - same
@@ -192,7 +198,33 @@ class CEOBriefingService:
             "latest_health_score": latest_health_score,
             "health_score_delta": health_score_delta,
             "business_profile": business_profile,
+            "todays_calendar_events": await self._get_todays_calendar_events(business.id),
         }
+
+    async def _get_todays_calendar_events(self, business_id: UUID) -> list[dict] | None:
+        """
+        None means "no calendar context at all" (not connected, or the
+        connection is currently broken) - the prompt template treats that
+        as additive-and-absent, never a reason to fail the briefing. An
+        empty list is a real, meaningful answer ("connected, zero events
+        today"), which is different from not being connected at all.
+        """
+        status = self.google_calendar.get_status(business_id)
+        if not status["connected"]:
+            return None
+
+        try:
+            events = await self.google_calendar.get_upcoming_events(business_id)
+        except GoogleCalendarError:
+            # A broken calendar connection (revoked access, Google API
+            # hiccup, etc.) must never take down CEO Briefing generation -
+            # same principle as "no connection at all": additive context
+            # only, never a hard dependency.
+            logger.warning("Google Calendar fetch failed for business %s; omitting from briefing", business_id)
+            return None
+
+        today = datetime.now(timezone.utc).date()
+        return [e for e in events if e["start"] and e["start"][:10] == today.isoformat()]
 
     def _sum_revenue(self, business_id: UUID, start_date: date, end_date: date) -> float:
         total = (

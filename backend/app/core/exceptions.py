@@ -57,6 +57,11 @@ class StripeConnectError(LuminOSError):
     status_code = status.HTTP_502_BAD_GATEWAY
 
 
+class GoogleCalendarError(LuminOSError):
+    code = "GOOGLE_CALENDAR_ERROR"
+    status_code = status.HTTP_502_BAD_GATEWAY
+
+
 def _envelope(code: str, message: str, details: dict | None = None) -> dict:
     return {"error": {"code": code, "message": message, "details": details or {}}}
 

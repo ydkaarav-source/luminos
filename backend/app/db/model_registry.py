@@ -18,3 +18,4 @@ from app.models.trade import Trade  # noqa: F401
 from app.models.website_brief import WebsiteBrief  # noqa: F401
 from app.models.stripe_connection import StripeConnection  # noqa: F401
 from app.models.password_reset_token import PasswordResetToken  # noqa: F401
+from app.models.google_calendar_connection import GoogleCalendarConnection  # noqa: F401

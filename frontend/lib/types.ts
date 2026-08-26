@@ -256,3 +256,19 @@ export interface StripeSyncResult {
   synced_count: number;
   total_fetched: number;
 }
+
+export interface GoogleCalendarConnectUrl {
+  url: string;
+}
+
+export interface GoogleCalendarStatus {
+  connected: boolean;
+  connected_at: string | null;
+  google_email: string | null;
+}
+
+export interface UpcomingEvent {
+  title: string;
+  start: string | null;
+  end: string | null;
+}

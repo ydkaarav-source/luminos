@@ -46,6 +46,14 @@ class Settings(BaseSettings):
     # Stripe redirects here - also environment-specific (Vercel in prod).
     FRONTEND_URL: str = "http://localhost:3000"
 
+    # --- Google Calendar (read-only) ---
+    GOOGLE_CALENDAR_CLIENT_ID: str = ""
+    GOOGLE_CALENDAR_CLIENT_SECRET: str = ""
+    # Must exactly match a redirect URI registered in the Google Cloud
+    # Console for this OAuth client. Different per environment (local vs
+    # Railway in production), so this is env-driven rather than hardcoded.
+    GOOGLE_CALENDAR_OAUTH_REDIRECT_URI: str = "http://localhost:8000/api/v1/google-calendar/oauth/callback"
+
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 

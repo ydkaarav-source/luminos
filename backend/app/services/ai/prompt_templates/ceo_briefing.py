@@ -24,6 +24,21 @@ def _format_business_profile(profile: dict | None) -> str:
     return "\n".join(f"- {label}: {profile.get(key) or 'not provided'}" for label, key in fields)
 
 
+def _format_calendar_events(events: list[dict] | None) -> str:
+    # None = not connected (or a broken connection) - this is genuinely
+    # absent context, not "zero events," so it's worded differently from
+    # a connected calendar that's simply empty today.
+    if events is None:
+        return "No calendar connected - this founder hasn't connected Google Calendar."
+    if not events:
+        return "Google Calendar connected - no events scheduled today."
+    lines = [f"Google Calendar connected - {len(events)} event(s) scheduled today:"]
+    for e in events:
+        start = (e["start"] or "")[11:16] or e["start"]
+        lines.append(f"- {start}: {e['title']}")
+    return "\n".join(lines)
+
+
 def build_prompt(business_name: str, metrics: dict, memory_lines: list[str]) -> tuple[str, str]:
     """
     Builds today's CEO Briefing prompt. Every figure below is already
@@ -61,7 +76,14 @@ TODAY in a single sitting - not a strategic direction like "improve
 marketing".
 Be honest about "confidence": use "low" when there's minimal real data to
 work with (e.g. zero revenue entries this week, or no prior Health Score
-to compare against) - never default to "high" just to seem more useful."""
+to compare against) - never default to "high" just to seem more useful.
+
+Today's calendar (if connected) is additional context, not a required
+ingredient - only reference it in "finding", "why", or "recommendation"
+when it's genuinely relevant to the most important thing happening in
+this business today (e.g. a heavy meeting day competing with an overdue
+task, or a clear day that's a good opportunity to catch up). Don't force
+a calendar mention into every briefing just because the data is present."""
 
     user = f"""Revenue:
 - This week (last 7 days): {_format_currency(metrics['revenue_this_week'])}
@@ -80,6 +102,9 @@ Business Health Score:
 
 Business profile:
 {_format_business_profile(metrics['business_profile'])}
+
+Today's calendar:
+{_format_calendar_events(metrics['todays_calendar_events'])}
 
 Known context about this founder and business:
 {format_memory_context(memory_lines)}
