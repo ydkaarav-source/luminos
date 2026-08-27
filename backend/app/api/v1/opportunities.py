@@ -24,6 +24,12 @@ def list_findings(business: Business = Depends(require_active_business), db: Ses
     return _envelope([OpportunityFindingOut.model_validate(f) for f in findings])
 
 
+@router.get("/resolved", response_model=Envelope[list[OpportunityFindingOut]])
+def list_resolved(business: Business = Depends(require_active_business), db: Session = Depends(get_db)):
+    findings = OpportunityRadarService(db).get_recently_resolved(business.id)
+    return _envelope([OpportunityFindingOut.model_validate(f) for f in findings])
+
+
 @router.post("/{finding_id}/dismiss", response_model=Envelope[OpportunityFindingOut])
 def dismiss(
     finding_id: UUID,

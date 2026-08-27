@@ -35,7 +35,9 @@ class OpportunityFinding(Base, UUIDPrimaryKeyMixin):
     with real computed numbers, never an AI call, and `details` holds
     the actual numbers behind the finding so it's always inspectable
     and re-derivable - same "code computes" discipline Health Score's
-    numeric scores already follow.
+    numeric scores already follow. `resolution_note` follows the same
+    discipline for resolved findings - see
+    OpportunityRadarService.check_resolutions.
     """
 
     __tablename__ = "opportunity_findings"
@@ -56,3 +58,10 @@ class OpportunityFinding(Base, UUIDPrimaryKeyMixin):
     detected_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
     )
+    # Resolution tracking - independent of is_dismissed. Set only when a
+    # scheduled re-check (see OpportunityRadarService.check_resolutions)
+    # confirms the same threshold logic used to detect this finding no
+    # longer holds. resolution_note is plain string formatting from real
+    # before/after numbers, same as `title` - never an AI call.
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    resolution_note: Mapped[str | None] = mapped_column(String(300), nullable=True)

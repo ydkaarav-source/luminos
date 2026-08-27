@@ -19,17 +19,20 @@ option once you need more capacity) or a Railway-triggered endpoint
 hit by an external cron service (e.g. cron-job.org, or Railway's own
 Cron Jobs against a one-off service) would be the right fix.
 """
+from datetime import datetime, timedelta, timezone
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import or_
 
 from app.core.logging import get_logger
 from app.db.session import SessionLocal
 from app.models.business import Business
+from app.models.opportunity_finding import OpportunityFinding
 from app.models.revenue_entry import RevenueEntry
 from app.models.stripe_connection import StripeConnection
 from app.models.task import Task
 from app.models.user import User
-from app.services.opportunity_radar_service import OpportunityRadarService
+from app.services.opportunity_radar_service import MIN_RESOLUTION_CHECK_AGE_HOURS, OpportunityRadarService
 from app.services.stripe_service import StripeService
 
 logger = get_logger(__name__)
@@ -41,6 +44,17 @@ SYNC_INTERVAL_HOURS = 4
 # meaningfully fresher, and once daily keeps this appropriately light
 # for what are explicitly "slower-moving" checks.
 RADAR_INTERVAL_HOURS = 24
+# Same cadence as detection, and for the same reason - resolution
+# signals are exactly as day-granular as detection signals (they reuse
+# the identical threshold logic - see check_resolutions). Registered as
+# its own job rather than tacked onto the end of
+# run_opportunity_radar_all_businesses: the two operations select
+# businesses differently (detection needs "onboarded + has real data",
+# resolution-checking needs "has an eligible open finding"), and this
+# app's existing scheduled jobs are each one concern, not several -
+# keeping them separate also means a bug in resolution-checking can
+# never block new detection from running, or vice versa.
+RESOLUTION_CHECK_INTERVAL_HOURS = 24
 
 scheduler = AsyncIOScheduler()
 
@@ -107,6 +121,49 @@ async def run_opportunity_radar_all_businesses() -> None:
             db.close()
 
 
+async def run_opportunity_radar_resolution_checks() -> None:
+    """
+    Re-checks every OPEN finding (resolved_at is null) that's old
+    enough to meaningfully re-evaluate, across every business that
+    actually has one - see OpportunityRadarService.check_resolutions
+    for the per-finding logic. Scoping to businesses with an eligible
+    open finding (rather than re-deriving the "onboarded + has real
+    data" filter detection uses) is both simpler and more correct here:
+    findings only ever exist for real businesses in the first place, so
+    this query is naturally already restricted to them.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=MIN_RESOLUTION_CHECK_AGE_HOURS)
+    db = SessionLocal()
+    try:
+        business_ids = [
+            row[0]
+            for row in db.query(OpportunityFinding.business_id)
+            .filter(
+                OpportunityFinding.resolved_at.is_(None),
+                OpportunityFinding.detected_at <= cutoff,
+            )
+            .distinct()
+            .all()
+        ]
+    finally:
+        db.close()
+
+    for business_id in business_ids:
+        db = SessionLocal()
+        try:
+            resolved = OpportunityRadarService(db).check_resolutions(business_id)
+            if resolved:
+                logger.info(
+                    "Opportunity Radar resolved %d finding(s) for business %s",
+                    len(resolved),
+                    business_id,
+                )
+        except Exception:  # noqa: BLE001 - one broken business must never stop the rest of the run
+            logger.exception("Opportunity Radar resolution check failed for business %s", business_id)
+        finally:
+            db.close()
+
+
 def start_scheduler() -> None:
     scheduler.add_job(
         sync_all_connected_accounts,
@@ -120,6 +177,13 @@ def start_scheduler() -> None:
         trigger="interval",
         hours=RADAR_INTERVAL_HOURS,
         id="opportunity_radar_all",
+        replace_existing=True,
+    )
+    scheduler.add_job(
+        run_opportunity_radar_resolution_checks,
+        trigger="interval",
+        hours=RESOLUTION_CHECK_INTERVAL_HOURS,
+        id="opportunity_radar_resolution_checks",
         replace_existing=True,
     )
     scheduler.start()

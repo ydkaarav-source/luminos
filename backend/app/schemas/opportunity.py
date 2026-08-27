@@ -13,5 +13,7 @@ class OpportunityFindingOut(BaseModel):
     title: str
     details: dict
     detected_at: datetime
+    resolved_at: datetime | None
+    resolution_note: str | None
 
     model_config = {"from_attributes": True}
