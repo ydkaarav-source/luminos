@@ -1,8 +1,7 @@
 import json
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import GoogleCalendarError
@@ -10,11 +9,11 @@ from app.core.logging import get_logger
 from app.models.ai_conversation import ConversationContext
 from app.models.ai_insight import AIInsight, InsightPriority, InsightType
 from app.models.business import Business
-from app.models.revenue_entry import RevenueEntry
 from app.models.task import Task, TaskStatus
 from app.repositories.business_profile_repository import BusinessProfileRepository
 from app.services.ai.ai_orchestrator import AIOrchestrator
 from app.services.ai.prompt_templates import ceo_briefing as prompt_template
+from app.services.business_metrics_service import BusinessMetricsService
 from app.services.google_calendar_service import GoogleCalendarService
 from app.services.health_score_service import HealthScoreService
 
@@ -28,6 +27,7 @@ class CEOBriefingService:
         self.health_score_service = HealthScoreService(db)
         self.business_profiles = BusinessProfileRepository(db)
         self.google_calendar = GoogleCalendarService(db)
+        self.metrics = BusinessMetricsService(db)
 
     def get_today(self, business_id: UUID) -> AIInsight | None:
         today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
@@ -104,19 +104,14 @@ class CEOBriefingService:
         split as Health Score: code computes, AI explains.
         """
         now = datetime.now(timezone.utc)
-        today_date = now.date()
 
-        # Revenue: this week vs. the week before, compared in Python so
-        # the percentage change is exact rather than an AI guess.
-        week_start = today_date - timedelta(days=7)
-        prior_week_start = today_date - timedelta(days=14)
-        revenue_this_week = self._sum_revenue(business.id, week_start, today_date)
-        revenue_last_week = self._sum_revenue(business.id, prior_week_start, week_start)
-        revenue_change_pct = (
-            round(((revenue_this_week - revenue_last_week) / revenue_last_week) * 100, 1)
-            if revenue_last_week
-            else None
-        )
+        # Revenue: this week vs. the week before - computed once in
+        # BusinessMetricsService so this and the Opportunity Radar never
+        # disagree about what "this week's revenue" means.
+        revenue = self.metrics.revenue_week_over_week(business.id)
+        revenue_this_week = revenue["this_week"]
+        revenue_last_week = revenue["last_week"]
+        revenue_change_pct = revenue["change_pct"]
 
         # Tasks: yesterday's completions, the same 24h window one week ago
         # for comparison, and overdue open tasks - a real signal that
@@ -143,15 +138,9 @@ class CEOBriefingService:
             )
             .count()
         )
-        overdue_tasks_count = (
-            self.db.query(Task)
-            .filter(
-                Task.business_id == business.id,
-                Task.status.in_([TaskStatus.TODO, TaskStatus.IN_PROGRESS]),
-                Task.due_date < today_date,
-            )
-            .count()
-        )
+        # Same shared overdue-tasks query the Opportunity Radar uses -
+        # see business_metrics_service.py.
+        overdue_tasks_count = len(self.metrics.overdue_tasks(business.id))
         open_priority_tasks = [
             t.title
             for t in self.db.query(Task)
@@ -225,15 +214,3 @@ class CEOBriefingService:
 
         today = datetime.now(timezone.utc).date()
         return [e for e in events if e["start"] and e["start"][:10] == today.isoformat()]
-
-    def _sum_revenue(self, business_id: UUID, start_date: date, end_date: date) -> float:
-        total = (
-            self.db.query(func.sum(RevenueEntry.amount))
-            .filter(
-                RevenueEntry.business_id == business_id,
-                RevenueEntry.entry_date >= start_date,
-                RevenueEntry.entry_date < end_date,
-            )
-            .scalar()
-        )
-        return float(total) if total is not None else 0.0

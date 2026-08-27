@@ -13,6 +13,7 @@ from app.api.v1 import (
     health_score,
     memory,
     onboarding,
+    opportunities,
     projects,
     revenue,
     stripe,
@@ -41,3 +42,4 @@ api_router.include_router(assistant.router)
 api_router.include_router(trades.router)
 api_router.include_router(analytics.router)
 api_router.include_router(memory.router)
+api_router.include_router(opportunities.router)
