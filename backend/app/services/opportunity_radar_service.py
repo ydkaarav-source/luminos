@@ -42,8 +42,10 @@ from uuid import UUID
 from sqlalchemy import case
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.exceptions import NotFoundError, WebsiteUnreachableError
 from app.core.logging import get_logger
+from app.models.business import Business
 from app.models.opportunity_finding import (
     OpportunityFinding,
     OpportunityFindingSeverity,
@@ -51,8 +53,10 @@ from app.models.opportunity_finding import (
 )
 from app.models.revenue_entry import RevenueEntry, RevenueEntryOrigin
 from app.models.stripe_connection import StripeConnection
+from app.models.user import User
 from app.models.website_brief import WebsiteBrief
 from app.services.business_metrics_service import BusinessMetricsService
+from app.services.email_service import EmailService
 from app.services.website_scraper_service import WebsiteScraperService
 
 logger = get_logger(__name__)
@@ -102,6 +106,7 @@ class OpportunityRadarService:
         self.db = db
         self.metrics = BusinessMetricsService(db)
         self.scraper = WebsiteScraperService()
+        self.email = EmailService()
         # One dispatch table, built once, reused by both detection
         # (indirectly, via each _check_* method) and resolution-checking
         # (directly, in check_resolutions) - this is what guarantees the
@@ -544,4 +549,36 @@ class OpportunityRadarService:
         self.db.add(finding)
         self.db.commit()
         self.db.refresh(finding)
+        self._notify_new_finding(business_id, finding)
         return finding
+
+    def _notify_new_finding(self, business_id: UUID, finding: OpportunityFinding) -> None:
+        """
+        The whole point of a PROACTIVE feature is that it reaches the
+        founder without them having to open the app - called only from
+        the genuine-creation path above (never on a dedup no-op), so a
+        finding that already exists never sends a second email for the
+        same open finding. Demo Mode never reaches this: DemoDataService
+        never persists anything (see its own docstring) and the
+        scheduler only ever evaluates real, onboarded businesses with
+        real data, so no OpportunityFinding row - and therefore no
+        notification - can ever exist for a fictional demo business.
+        """
+        owner = (
+            self.db.query(User)
+            .join(Business, Business.user_id == User.id)
+            .filter(Business.id == business_id)
+            .first()
+        )
+        if not owner or not owner.email_notifications_enabled:
+            return
+
+        dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+        self.email.send_email(
+            to=owner.email,
+            subject=f"LuminOS: {finding.title}",
+            html=(
+                f"<p>{finding.title}</p>"
+                f'<p><a href="{dashboard_url}">View it in your LuminOS Dashboard</a></p>'
+            ),
+        )

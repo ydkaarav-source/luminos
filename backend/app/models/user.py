@@ -28,6 +28,11 @@ class User(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     skills: Mapped[List[str] | None] = mapped_column(ARRAY(String), nullable=True)
     interests: Mapped[List[str] | None] = mapped_column(ARRAY(String), nullable=True)
     onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # Opt-out, not opt-in: defaults True so a founder actually receives
+    # Opportunity Radar's proactive findings by email without first having
+    # to discover a preference for a feature they don't know exists yet -
+    # see OpportunityRadarService._create_if_new for where this is read.
+    email_notifications_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     businesses: Mapped[List["Business"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"

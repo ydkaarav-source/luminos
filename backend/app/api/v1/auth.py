@@ -7,12 +7,14 @@ from app.core.config import settings
 from app.dependencies.auth_dependencies import get_current_user
 from app.dependencies.db_dependencies import get_db
 from app.models.user import User
+from app.repositories.user_repository import UserRepository
 from app.schemas.auth import (
     ForgotPasswordRequest,
     ForgotPasswordResponse,
     LoginRequest,
     ResetPasswordRequest,
     SignupRequest,
+    UpdateUserPreferencesRequest,
     UserOut,
 )
 from app.schemas.common import Envelope, ResponseMeta
@@ -70,6 +72,21 @@ def me(current_user: User = Depends(get_current_user)):
     )
 
 
+@router.patch("/me", response_model=Envelope[UserOut])
+def update_me(
+    payload: UpdateUserPreferencesRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    for field, value in payload.model_dump(exclude_unset=True).items():
+        setattr(current_user, field, value)
+    current_user = UserRepository(db).save(current_user)
+    return Envelope(
+        data=UserOut.model_validate(current_user),
+        meta=ResponseMeta(generated_at=datetime.now(timezone.utc)),
+    )
+
+
 _GENERIC_RESET_MESSAGE = "If an account with that email exists, we've sent password reset instructions."
 
 
@@ -80,11 +97,10 @@ def forgot_password(payload: ForgotPasswordRequest, db: Session = Depends(get_db
 
     data = ForgotPasswordResponse(message=_GENERIC_RESET_MESSAGE)
     if raw_token and settings.ENVIRONMENT != "production":
-        # No email delivery exists anywhere in this codebase yet (checked
-        # before writing this - see the final report). TODO: send this via
-        # a real transactional email provider before this is usable by
-        # real production users; until then, non-production responses
-        # carry the raw link directly so local dev/testing works.
+        # AuthService.request_password_reset also sends a real email via
+        # Resend (see email_service.py) - this dev-mode raw-token-in-
+        # response path is additional, not a replacement, so local
+        # dev/testing still works without depending on inbox access.
         data.reset_token = raw_token
         data.reset_url = f"{settings.FRONTEND_URL}/reset-password?token={raw_token}"
 

@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     # Stripe redirects here - also environment-specific (Vercel in prod).
     FRONTEND_URL: str = "http://localhost:3000"
 
+    # --- Email (Resend) ---
+    RESEND_API_KEY: str = ""
+    RESEND_FROM_EMAIL: str = ""
+
     # --- Google Calendar (read-only) ---
     GOOGLE_CALENDAR_CLIENT_ID: str = ""
     GOOGLE_CALENDAR_CLIENT_SECRET: str = ""

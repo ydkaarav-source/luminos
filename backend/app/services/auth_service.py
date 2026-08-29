@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.exceptions import ConflictError, UnauthorizedError
 from app.core.security import (
     create_access_token,
@@ -14,6 +15,7 @@ from app.core.security import (
 from app.models.password_reset_token import PasswordResetToken
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
+from app.services.email_service import EmailService
 
 RESET_TOKEN_EXPIRE_HOURS = 1
 
@@ -22,6 +24,7 @@ class AuthService:
     def __init__(self, db: Session):
         self.db = db
         self.users = UserRepository(db)
+        self.email = EmailService()
 
     def signup(self, email: str, password: str, name: str) -> tuple[User, str, str]:
         if self.users.get_by_email(email):
@@ -49,6 +52,11 @@ class AuthService:
         account existence through its return value alone; the route is
         responsible for always sending the same generic response either
         way.
+
+        Also sends a real reset email to the account, alongside (not
+        instead of) that return value - the dev-mode raw-token-in-response
+        fallback in POST /auth/forgot-password is untouched and still
+        works for local testing regardless of whether the send succeeds.
         """
         user = self.users.get_by_email(email)
         if not user:
@@ -62,6 +70,18 @@ class AuthService:
         )
         self.db.add(token)
         self.db.commit()
+
+        reset_url = f"{settings.FRONTEND_URL}/reset-password?token={raw_token}"
+        self.email.send_email(
+            to=user.email,
+            subject="Reset your LuminOS password",
+            html=(
+                "<p>We received a request to reset your LuminOS password.</p>"
+                f'<p><a href="{reset_url}">Click here to reset your password</a></p>'
+                f"<p>This link expires in {RESET_TOKEN_EXPIRE_HOURS} hour(s). "
+                "If you didn't request this, you can safely ignore this email.</p>"
+            ),
+        )
         return raw_token
 
     def reset_password(self, token: str, new_password: str) -> None:

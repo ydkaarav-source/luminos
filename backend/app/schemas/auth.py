@@ -19,8 +19,13 @@ class UserOut(BaseModel):
     email: EmailStr
     name: str | None
     onboarding_completed: bool
+    email_notifications_enabled: bool
 
     model_config = {"from_attributes": True}
+
+
+class UpdateUserPreferencesRequest(BaseModel):
+    email_notifications_enabled: bool | None = None
 
 
 class ForgotPasswordRequest(BaseModel):

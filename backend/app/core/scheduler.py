@@ -19,6 +19,7 @@ option once you need more capacity) or a Railway-triggered endpoint
 hit by an external cron service (e.g. cron-job.org, or Railway's own
 Cron Jobs against a one-off service) would be the right fix.
 """
+import asyncio
 from datetime import datetime, timedelta, timezone
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -56,6 +57,19 @@ RADAR_INTERVAL_HOURS = 24
 # keeping them separate also means a bug in resolution-checking can
 # never block new detection from running, or vice versa.
 RESOLUTION_CHECK_INTERVAL_HOURS = 24
+
+# Resend's unverified-account rate limit is 2 requests/second. A new
+# finding this run means OpportunityRadarService._create_if_new just
+# attempted a notification send for this business (see
+# email_service.py's own retry-on-429 for the complementary safety net,
+# in case two businesses' sends still land close enough together to
+# collide) - pausing here specifically, rather than between every
+# business regardless of whether one just emailed, keeps the common
+# case (a run with no new findings) fast. Simple and proportionate to
+# this app's current real scale; a real send queue/batching system
+# would be the right fix if daily finding volume ever grows enough for
+# a flat delay to meaningfully slow down the whole run.
+NOTIFICATION_SEND_DELAY_SECONDS = 0.5
 
 scheduler = AsyncIOScheduler()
 
@@ -131,6 +145,7 @@ async def run_opportunity_radar_all_businesses() -> None:
                     len(created),
                     business_id,
                 )
+                await asyncio.sleep(NOTIFICATION_SEND_DELAY_SECONDS)
         except Exception:  # noqa: BLE001 - one broken business must never stop the rest of the run
             logger.exception("Opportunity Radar check failed for business %s", business_id)
         finally:
