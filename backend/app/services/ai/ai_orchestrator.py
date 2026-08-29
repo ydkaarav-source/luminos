@@ -46,6 +46,17 @@ class AIOrchestrator:
         records = self.memory_repo.retrieve(business_id, memory_types=memory_types)
         return [r.content for r in records]
 
+    def get_older_memory_context(
+        self,
+        business_id: UUID,
+        min_age_days: int = 14,
+        memory_types: list[MemoryType] | None = None,
+    ) -> list[str]:
+        records = self.memory_repo.get_older_context(
+            business_id, min_age_days=min_age_days, memory_types=memory_types
+        )
+        return [r.content for r in records]
+
     async def run(
         self,
         *,

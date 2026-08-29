@@ -39,7 +39,12 @@ def _format_calendar_events(events: list[dict] | None) -> str:
     return "\n".join(lines)
 
 
-def build_prompt(business_name: str, metrics: dict, memory_lines: list[str]) -> tuple[str, str]:
+def build_prompt(
+    business_name: str,
+    metrics: dict,
+    recent_memory_lines: list[str],
+    older_memory_lines: list[str],
+) -> tuple[str, str]:
     """
     Builds today's CEO Briefing prompt. Every figure below is already
     computed in Python (same split as Health Score: code computes, AI
@@ -83,7 +88,22 @@ ingredient - only reference it in "finding", "why", or "recommendation"
 when it's genuinely relevant to the most important thing happening in
 this business today (e.g. a heavy meeting day competing with an overdue
 task, or a clear day that's a good opportunity to catch up). Don't force
-a calendar mention into every briefing just because the data is present."""
+a calendar mention into every briefing just because the data is present.
+
+Below, "Known context about this founder and business" and "Older
+context from further in the past" are two separate sections - treat
+them differently. The older section is optional background the founder
+mentioned some time ago. On most days, none of it will be relevant, and
+silently ignoring all of it is the expected, normal outcome - do not
+force a reference into every briefing just because an older item
+exists. Reference AT MOST ONE older item, and only when it is genuinely,
+specifically relevant to today's finding (e.g. a fear or decision the
+founder stated that directly connects to what's actually happening in
+the numbers right now). When you do reference one, weave it naturally
+into "finding" or "why" as part of the sentence - never as a separate
+bolted-on sentence - and always tie it explicitly to a real, current
+number from the data below. Never write a vague "as you mentioned
+before" with nothing concrete attached to it."""
 
     user = f"""Revenue:
 - This week (last 7 days): {_format_currency(metrics['revenue_this_week'])}
@@ -107,7 +127,12 @@ Today's calendar:
 {_format_calendar_events(metrics['todays_calendar_events'])}
 
 Known context about this founder and business:
-{format_memory_context(memory_lines)}
+{format_memory_context(recent_memory_lines)}
+
+Older context from further in the past (reference AT MOST ONE item, and
+only if genuinely, specifically relevant to today's finding - otherwise
+ignore this section entirely):
+{format_memory_context(older_memory_lines)}
 
 Write today's briefing JSON now."""
 

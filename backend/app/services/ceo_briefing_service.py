@@ -58,8 +58,11 @@ class CEOBriefingService:
 
         metrics = await self._gather_metrics(business)
 
-        memory_lines = self.ai.get_memory_context(business.id)
-        system_prompt, user_prompt = prompt_template.build_prompt(business.name, metrics, memory_lines)
+        recent_memory_lines = self.ai.get_memory_context(business.id)
+        older_memory_lines = self.ai.get_older_memory_context(business.id)
+        system_prompt, user_prompt = prompt_template.build_prompt(
+            business.name, metrics, recent_memory_lines, older_memory_lines
+        )
 
         raw = await self.ai.run(
             business_id=business.id,

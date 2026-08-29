@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -34,6 +35,49 @@ class MemoryRepository:
             query.order_by(
                 MemoryRecord.relevance_score.desc(), MemoryRecord.created_at.desc()
             )
+            .limit(limit)
+            .all()
+        )
+
+    def get_older_context(
+        self,
+        business_id: UUID,
+        min_age_days: int = 14,
+        memory_types: list[MemoryType] | None = None,
+        limit: int = 5,
+    ) -> list[MemoryRecord]:
+        """
+        A separate, deliberately OLDER slice of memory - for occasional
+        "remembered that" callbacks (e.g. in CEO Briefing), not routine
+        context. This is its own query, not a variant of `retrieve`: the
+        two serve different purposes and must be free to diverge without
+        risking each other's behavior.
+
+        Defaults to DECISION and PREFERENCE - the "founder stated
+        something meaningful" categories. FACT and onboarding-sourced
+        records are routine background, not the kind of thing that makes
+        a good callback.
+
+        Ordered by relevance_score (the same signal `retrieve` already
+        ranks by), not pure recency-among-old-records: recency here would
+        only measure how long ago something crossed the age cutoff, which
+        says nothing about whether it was actually significant.
+        relevance_score is this app's only stored proxy for "was this
+        meaningful when recorded" - a high-relevance memory from 40 days
+        ago is a better callback candidate than a low-relevance one from
+        15 days ago, so it's the more useful ordering here.
+        """
+        if memory_types is None:
+            memory_types = [MemoryType.DECISION, MemoryType.PREFERENCE]
+        cutoff = datetime.now(timezone.utc) - timedelta(days=min_age_days)
+        return (
+            self.db.query(MemoryRecord)
+            .filter(
+                MemoryRecord.business_id == business_id,
+                MemoryRecord.memory_type.in_(memory_types),
+                MemoryRecord.created_at <= cutoff,
+            )
+            .order_by(MemoryRecord.relevance_score.desc(), MemoryRecord.created_at.desc())
             .limit(limit)
             .all()
         )
