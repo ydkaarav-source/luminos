@@ -32,6 +32,7 @@ from app.models.revenue_entry import RevenueEntry
 from app.models.stripe_connection import StripeConnection
 from app.models.task import Task
 from app.models.user import User
+from app.models.website_brief import WebsiteBrief
 from app.services.opportunity_radar_service import MIN_RESOLUTION_CHECK_AGE_HOURS, OpportunityRadarService
 from app.services.stripe_service import StripeService
 
@@ -80,12 +81,20 @@ async def sync_all_connected_accounts() -> None:
 async def run_opportunity_radar_all_businesses() -> None:
     """
     Runs Opportunity Radar checks for every business with a real,
-    completed onboarding AND at least one real revenue entry or task
-    logged - a fresh, empty business has nothing to meaningfully check
-    yet, and Demo Mode's fictional data is never persisted anywhere
-    (see demo_data_service.py), so it can never appear here regardless -
-    only genuinely real businesses with genuinely real data are ever
-    checked, same discipline as everywhere else in this app.
+    completed onboarding AND at least one real revenue entry, task, or
+    connected live website logged - a fresh, empty business has nothing
+    to meaningfully check yet, and Demo Mode's fictional data is never
+    persisted anywhere (see demo_data_service.py), so it can never appear
+    here regardless - only genuinely real businesses with genuinely real
+    data are ever checked, same discipline as everywhere else in this
+    app. The website-brief condition exists so a pre-revenue business
+    that's only connected a live site still gets its content re-scraped.
+
+    The website re-scrape check (check_website_content_changed) runs
+    here too, in the same per-business loop, rather than as a separate
+    scheduler.add_job() registration - it's still the same daily Radar
+    sweep at the same interval, just with one check that needs a real
+    network call instead of a DB query.
     """
     db = SessionLocal()
     try:
@@ -98,6 +107,9 @@ async def run_opportunity_radar_all_businesses() -> None:
                 or_(
                     db.query(RevenueEntry.id).filter(RevenueEntry.business_id == Business.id).exists(),
                     db.query(Task.id).filter(Task.business_id == Business.id).exists(),
+                    db.query(WebsiteBrief.id)
+                    .filter(WebsiteBrief.business_id == Business.id, WebsiteBrief.site_url.isnot(None))
+                    .exists(),
                 ),
             )
             .all()
@@ -108,7 +120,11 @@ async def run_opportunity_radar_all_businesses() -> None:
     for business_id in business_ids:
         db = SessionLocal()
         try:
-            created = OpportunityRadarService(db).run_checks(business_id)
+            radar = OpportunityRadarService(db)
+            created = radar.run_checks(business_id)
+            content_changed = await radar.check_website_content_changed(business_id)
+            if content_changed:
+                created.append(content_changed)
             if created:
                 logger.info(
                     "Opportunity Radar created %d finding(s) for business %s",

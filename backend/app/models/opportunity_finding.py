@@ -16,6 +16,7 @@ class OpportunityFindingType(str, enum.Enum):
     TASK_OVERDUE = "task_overdue"
     WEBSITE_NOT_CONNECTED = "website_not_connected"
     STRIPE_SYNC_STALE = "stripe_sync_stale"
+    WEBSITE_CONTENT_CHANGED = "website_content_changed"
 
 
 class OpportunityFindingSeverity(str, enum.Enum):

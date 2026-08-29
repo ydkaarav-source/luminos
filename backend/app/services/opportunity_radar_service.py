@@ -24,17 +24,26 @@ Resolution tracking (this app's first "closed loop" capability) is a
 separate lifecycle stage on top of that: independent of is_dismissed,
 every OPEN finding (resolved_at is null) gets periodically re-checked
 against the SAME threshold logic used for detection - see
-check_resolutions and _condition_evaluators below. This only ever
-records that a flagged condition was later observed to no longer be
-true; it never claims LuminOS caused that change.
+check_resolutions and _evaluators below. This only ever records that a
+flagged condition was later observed to no longer be true; it never
+claims LuminOS caused that change.
+
+One finding type, WEBSITE_CONTENT_CHANGED (see
+check_website_content_changed), doesn't fit that state-threshold model
+at all - a site's content changing is a one-time event, not an ongoing
+condition that can later become "not true" again, so it's intentionally
+excluded from resolution tracking; dismissing is its only close.
 """
+import hashlib
+import re
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from sqlalchemy import case
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import NotFoundError, WebsiteUnreachableError
+from app.core.logging import get_logger
 from app.models.opportunity_finding import (
     OpportunityFinding,
     OpportunityFindingSeverity,
@@ -44,6 +53,33 @@ from app.models.revenue_entry import RevenueEntry, RevenueEntryOrigin
 from app.models.stripe_connection import StripeConnection
 from app.models.website_brief import WebsiteBrief
 from app.services.business_metrics_service import BusinessMetricsService
+from app.services.website_scraper_service import WebsiteScraperService
+
+logger = get_logger(__name__)
+
+# Reduces false positives before hashing - imperfect by design, not a
+# general-purpose diff tool. Only strips a year immediately following an
+# explicit ©/"copyright" marker (the single most common auto-updating
+# footer text), not any bare 4-digit number - a real price or year
+# mentioned elsewhere in the page must never be silently erased. This
+# intentionally does NOT catch every form of "dynamic" content (a bare
+# year with no ©/"copyright" marker, a "last updated" timestamp in
+# prose, a visitor counter) - those still register as a real content
+# change. That's an honest limitation of a cheap regex approach, not a
+# silent gap - see this task's final report.
+_COPYRIGHT_YEAR_RE = re.compile(r"(?:©|copyright)\s*\d{4}(?:\s*[-–]\s*\d{4})?", re.IGNORECASE)
+
+
+def _normalize_for_hash(text: str) -> str:
+    # Lowercased so a pure casing change (e.g. a heading's capitalization)
+    # isn't flagged as new content - re-collapse whitespace afterward
+    # since substitution can leave behind doubled spaces.
+    normalized = _COPYRIGHT_YEAR_RE.sub("", text.lower())
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _hash_content(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 # --- Thresholds - real product decisions, not arbitrary values. See
 # this task's final report for the reasoning behind each one. ---
@@ -65,6 +101,7 @@ class OpportunityRadarService:
     def __init__(self, db: Session):
         self.db = db
         self.metrics = BusinessMetricsService(db)
+        self.scraper = WebsiteScraperService()
         # One dispatch table, built once, reused by both detection
         # (indirectly, via each _check_* method) and resolution-checking
         # (directly, in check_resolutions) - this is what guarantees the
@@ -146,7 +183,15 @@ class OpportunityRadarService:
 
         resolved = []
         for finding in open_findings:
-            current_values_fn, condition_fn = self._evaluators[finding.finding_type]
+            evaluator = self._evaluators.get(finding.finding_type)
+            if evaluator is None:
+                # Not every finding_type has a re-checkable threshold
+                # condition - WEBSITE_CONTENT_CHANGED reports a one-time
+                # event (content changed), not an ongoing state that can
+                # revert to "not true". Dismissing is the only way those
+                # findings close.
+                continue
+            current_values_fn, condition_fn = evaluator
             current_values = current_values_fn(business_id)
             if condition_fn(current_values):
                 continue  # still true - no change
@@ -379,6 +424,95 @@ class OpportunityRadarService:
             f"Stripe synced new revenue {after['hours_since_last_sync']:.1f} hours ago "
             f"(was stale for {before['hours_since_last_sync']:.1f} hours when this was flagged)."
         )
+
+    async def check_website_content_changed(self, business_id: UUID) -> OpportunityFinding | None:
+        """
+        Re-scrapes the business's live site (the latest WebsiteBrief with
+        a site_url set, same "latest brief" convention
+        _current_website_values already uses) and compares against the
+        hash from the last scrape.
+
+        Deliberately NOT one of the five threshold checks above: it needs
+        a real async network call (the others are pure DB queries), and
+        it has a required side effect - the new hash/timestamp/word count
+        are stored whether or not a finding is created, so the next
+        comparison is always against the freshest content. That's also
+        why it isn't in _evaluators/_resolution_notes: content changing
+        is a one-time event, not a state to re-evaluate later (see the
+        skip in check_resolutions above).
+
+        The very first scrape for a brief has nothing to compare against
+        - previous_hash is None, so this only establishes the baseline
+        and never creates a finding on that run.
+        """
+        # Same "latest brief overall, then check its site_url" query
+        # _current_website_values already uses - not filtering on site_url
+        # in the WHERE clause, so both checks always agree on which brief
+        # is "current" (a regenerated brief with no site_url is
+        # consistently "not connected" for both checks, never a stale
+        # older brief silently re-scraped instead).
+        brief = (
+            self.db.query(WebsiteBrief)
+            .filter(WebsiteBrief.business_id == business_id)
+            .order_by(WebsiteBrief.created_at.desc())
+            .first()
+        )
+        if not brief or not brief.site_url:
+            return None
+
+        try:
+            raw_text = await self.scraper.scrape(brief.site_url)
+        except WebsiteUnreachableError:
+            # A temporarily-down or now-blocking site must never corrupt
+            # the stored comparison baseline - leave it untouched and try
+            # again next scheduled run, same "don't work around a real
+            # failure" discipline the scraper itself already documents.
+            logger.warning("Opportunity Radar re-scrape failed for business %s", business_id)
+            return None
+
+        new_word_count = len(raw_text.split())
+        new_hash = _hash_content(_normalize_for_hash(raw_text))
+        previous_hash = brief.last_scraped_content_hash
+        previous_word_count = brief.last_scraped_word_count
+
+        finding = None
+        if previous_hash and previous_hash != new_hash:
+            title = self._website_content_changed_title(previous_word_count, new_word_count)
+            finding = self._create_if_new(
+                business_id,
+                OpportunityFindingType.WEBSITE_CONTENT_CHANGED,
+                OpportunityFindingSeverity.LOW,
+                title,
+                {
+                    "site_url": brief.site_url,
+                    "previous_word_count": previous_word_count,
+                    "new_word_count": new_word_count,
+                },
+            )
+
+        brief.last_scraped_content_hash = new_hash
+        brief.last_scraped_at = datetime.now(timezone.utc)
+        brief.last_scraped_word_count = new_word_count
+        self.db.add(brief)
+        self.db.commit()
+
+        return finding
+
+    def _website_content_changed_title(self, previous_word_count: int | None, new_word_count: int) -> str:
+        # Word count is the one honest, cheaply-verifiable "what changed"
+        # signal available without storing/diffing full page text (see
+        # the hash-only design above) - it can't say WHAT changed, only
+        # roughly how much. When the count happens to be identical despite
+        # the hash differing (words swapped for others of the same total
+        # count), fall back to the fully generic, still-honest phrasing
+        # rather than reporting a misleading "no change" word count.
+        if previous_word_count is not None and new_word_count != previous_word_count:
+            direction = "up" if new_word_count > previous_word_count else "down"
+            return (
+                f"Website content has changed since it was last checked "
+                f"(word count {direction} from {previous_word_count} to {new_word_count})"
+            )
+        return "Website content has changed since it was last checked"
 
     def _create_if_new(
         self,

@@ -1,6 +1,7 @@
 import uuid
+from datetime import datetime
 
-from sqlalchemy import ForeignKey, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSONB, UUID as PG_UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -19,9 +20,15 @@ class WebsiteBrief(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     regenerate as their business evolves, and GET /website-brief/latest
     reads the most recent row rather than upserting one.
 
-    `site_url` is unused by this task - it exists now so a future task
-    (fetching/scraping the founder's live site once built) can read
-    from it without a second migration.
+    `site_url`, once set, is periodically re-scraped by Opportunity
+    Radar (see OpportunityRadarService.check_website_content_changed) to
+    detect real content changes on the founder's live site -
+    last_scraped_content_hash/_at/_word_count track that check's own
+    state and are otherwise unused. Scoped to the specific brief row
+    (not the business) deliberately: regenerating a brief - possibly
+    with a different site_url - naturally starts a fresh comparison
+    baseline rather than comparing against a URL that's no longer this
+    brief's own.
     """
 
     __tablename__ = "website_briefs"
@@ -34,3 +41,13 @@ class WebsiteBrief(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     copy_direction: Mapped[str] = mapped_column(Text, nullable=False)
     design_direction: Mapped[str] = mapped_column(Text, nullable=False)
     site_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    # SHA-256 hex digest (64 chars) of the normalized last-scraped page
+    # text - not the raw text itself, so comparisons stay cheap and there's
+    # no growing archive of a founder's scraped site content beyond what
+    # memory_records already holds from the original one-shot scrape.
+    last_scraped_content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    last_scraped_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # A single number, not the text itself, kept alongside the hash so a
+    # detected change can honestly report *how much* changed (word count
+    # delta) without storing/diffing full page text.
+    last_scraped_word_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
